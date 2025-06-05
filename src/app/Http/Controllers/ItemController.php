@@ -120,50 +120,54 @@ class ItemController extends Controller
             ]],
             'mode' => 'payment',
             'customer_email' => $user->email,
-            'success_url' => route('purchase.success', [
+            'metadata' => [
+                'user_id' => $user->id,
                 'item_id' => $item->id,
                 'shipping_zipcode' => $request->shipping_zipcode,
                 'shipping_address' => $request->shipping_address,
                 'shipping_building' => $request->shipping_building,
                 'payment_method_id' => $paymentMethod->id,
-            ]),
-            'cancel_url' => route('purchase.cancel', ['item_id' => $item->id]),
+            ],
+            'success_url' => ('/'),
+            'cancel_url' => ('/'),
         ]);
     
         return redirect($session->url);
     }
 
-    public function success(Request $request, $itemId)
+    public function success(Request $request)
     {
-        $user = auth()->user();
-        $item = Item::findOrFail($itemId);
+        $payload = $request->getContent();
+        $sigHeader = $request->header('Stripe-Signature');
+        $endpointSecret = config('services.stripe.webhook_secret');
 
-        Purchase::updateOrCreate(
-            [
-                'user_id' => $user->id,
-                'item_id' => $item->id,
-            ],
-            [
-                'payment_method_id' => $request->payment_method_id,
-                'shipping_zipcode' => $request->shipping_zipcode,
-                'shipping_address' => $request->shipping_address,
-                'shipping_building' => $request->shipping_building,
-            ]
-        );
-        
-        $item->update(['sold' => true]);
-
-        return redirect('/');
-    }
-
-    public function cancel($purchaseId)
-    {
-        $purchase = Purchase::find($purchaseId);
-        if ($purchase && $purchase->user_id === auth()->id()) {
-            $purchase->delete();
+        try {
+            $event = \Stripe\Webhook::constructEvent($payload, $sigHeader, $endpointSecret);
+        } catch (\Exception $e) {
+            return response('Invalid signature', 400);
         }
+
+        if ($event->type === 'checkout.session.completed') {
+            $session = $event->data->object;
+            $metadata = $session->metadata;
+
+            Purchase::updateOrCreate(
+                [
+                    'user_id' => $metadata->user_id,
+                    'item_id' => $metadata->item_id,
+                ],
+                [
+                    'payment_method_id' => $metadata->payment_method_id,
+                    'shipping_zipcode' => $metadata->shipping_zipcode,
+                    'shipping_address' => $metadata->shipping_address,
+                    'shipping_building' => $metadata->shipping_building,
+                ]
+            );
         
-        return redirect('/');
+            Item::find($metadata->item_id)->update(['sold' => true]);
+        }
+
+        return response('Webhook received', 200);
     }
 
     public function edit($itemId)
@@ -207,6 +211,7 @@ class ItemController extends Controller
             'description',
             'price',
             'status_id',
+            'category_id'
         ]);
         $imagePath = $request->file('image')->store('item-img', 'public');
         $itemData['image'] = basename($imagePath);

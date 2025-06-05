@@ -31,7 +31,12 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials)) {
-            return redirect('/');
+            $user = Auth::user();
+            if (is_null($user->email_verified_at)) {
+                Auth::logout();
+                return back();
+            }
+            return redirect('/?page=mylist');
         }
     }
 

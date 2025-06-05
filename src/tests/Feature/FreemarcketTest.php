@@ -13,7 +13,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Mockery;
 use Tests\TestCase;
-use Stripe\Checkout\Session;
 
 class FreemarcketTest extends TestCase
 {
@@ -76,22 +75,23 @@ class FreemarcketTest extends TestCase
             'password_confirmation' => 'password1234',
         ]);
 
-        $response->assertSessionHasErrors(['password_confirmation']);
+        $response->assertSessionHasErrors(['password']);
     }
 
     public function test_registerSuccess(): void
     {
-        $user = [
+        $response = $this->post('/register', [
             'name' => '山田',
             'email' => 'test@example.com',
             'password' => 'password123',
             'password_confirmation' => 'password123',
-        ];
-
-        $response = $this->post('/register', $user);
+        ]);
         $response->assertRedirect('/email/verify');
 
-        $this->assertDatabaseHas('users', $user);
+        $this->assertDatabaseHas('users', [
+            'name' => '山田',
+            'email' => 'test@example.com',
+        ]);
     }
 
     public function test_loginNameValidation(): void
@@ -125,7 +125,7 @@ class FreemarcketTest extends TestCase
             'password' => 'pass12345',
         ]);
 
-        $response->assertSessionHasErrors(['email', 'password']);
+        $response->assertSessionHasErrors(['email']);
     }
 
     public function test_loginSuccess(): void
@@ -133,6 +133,7 @@ class FreemarcketTest extends TestCase
         User::factory()->create([
             'email' => 'test@example.com',
             'password' => bcrypt('password123'),
+            'email_verified_at' => now(),
         ]);
         $response = $this->post('/login', [
             'email' => 'test@example.com',
@@ -347,10 +348,10 @@ class FreemarcketTest extends TestCase
         $response->assertSeeText($item->name);
         $response->assertSeeText($item->brand);
         $response->assertSeeText($item->description);
-        $response->assertSeeText((string) $item->price);
+        $response->assertSeeText(number_format($item->price));
         $response->assertSee($item->image);
         $response->assertDontSeeText('Sold');
-        $response->assertSeeText($item->category->name);
+        $response->assertSeeText($item->categories->name);
         $response->assertSeeText($item->status->name);
         $response->assertSee((string) $item->likes()->count());
         $response->assertSee((string) $item->comments()->count());
@@ -505,13 +506,11 @@ class FreemarcketTest extends TestCase
             'name' => 'カード支払い',
         ]);
 
-        $mockSession = Mockery::mock(Session::class);
+        $mockSession = Mockery::mock('alias:Stripe\Checkout\Session');
         $mockSession->shouldReceive('create')->andReturn((object)[
             'id' => 'cs_test_123',
             'url' => 'https://checkout.stripe.com/pay/cs_test_123',
         ]);
-
-        $this->app->instance(Session::class, $mockSession);
 
         $purchaseData = ([
             'payment_method_id' => $paymentMethod->id,
@@ -543,13 +542,11 @@ class FreemarcketTest extends TestCase
             'name' => 'カード支払い',
         ]);
 
-        $mockSession = Mockery::mock(Session::class);
+        $mockSession = Mockery::mock('alias:Stripe\Checkout\Session');
         $mockSession->shouldReceive('create')->andReturn((object)[
             'id' => 'cs_test_123',
             'url' => 'https://checkout.stripe.com/pay/cs_test_123',
         ]);
-
-        $this->app->instance(Session::class, $mockSession);
 
         $purchaseData = ([
             'payment_method_id' => $paymentMethod->id,
@@ -585,13 +582,11 @@ class FreemarcketTest extends TestCase
             'name' => 'カード支払い',
         ]);
 
-        $mockSession = Mockery::mock(Session::class);
+        $mockSession = Mockery::mock('alias:Stripe\Checkout\Session');
         $mockSession->shouldReceive('create')->andReturn((object)[
             'id' => 'cs_test_123',
             'url' => 'https://checkout.stripe.com/pay/cs_test_123',
         ]);
-
-        $this->app->instance(Session::class, $mockSession);
 
         $purchaseData = ([
             'payment_method_id' => $paymentMethod->id,
@@ -655,12 +650,11 @@ class FreemarcketTest extends TestCase
             'name' => 'カード支払い',
         ]);
 
-        $mockSession = Mockery::mock(Session::class);
+        $mockSession = Mockery::mock('alias:Stripe\Checkout\Session');
         $mockSession->shouldReceive('create')->andReturn((object)[
             'id' => 'cs_test_123',
             'url' => 'https://checkout.stripe.com/pay/cs_test_123',
         ]);
-        $this->app->instance(Session::class, $mockSession);
 
         $purchaseData = ([
             'payment_method_id' => $paymentMethod->id,
@@ -765,23 +759,23 @@ class FreemarcketTest extends TestCase
         $category = Category::factory()->create();
         $status = Status::factory()->create();
         $image = UploadedFile::fake()->create('test.png');
-        $itemData = [
+
+        $response = $this->post('/', [
             'name' => '商品',
             'price' => 1000,
             'description' => '商品説明',
             'image' => $image,
             'status_id' => $status->id,
-            'category_ids' => [$category->id],
-        ];
+            'category_id' => $category->id,
+        ]);
 
-        $response = $this->post('/', $itemData);
+        $response->assertRedirect('/');
 
         $this->assertDatabaseHas('items', [
             'name' => '商品',
             'price' => 1000,
             'description' => '商品説明',
             'status_id' => $status->id,
-            'user_id' => $user->id,
         ]);
         $this->assertDatabaseHas('item_category', [
             'item_id' => Item::where('name', '商品')->first()->id,

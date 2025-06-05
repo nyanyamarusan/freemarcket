@@ -13,12 +13,11 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::post('/item/{item_id}', [ItemController::class, 'comment']);
     Route::get('/purchase/{item_id}', [ItemController::class, 'purchase']);
     Route::post('/purchase/{item_id}', [ItemController::class, 'buy']);
+    Route::post('/stripe/webhook', [ItemController::class, 'success']);
     Route::patch('/purchase/{item_id}', [ItemController::class, 'update']);
     Route::get('/purchase/address/{item_id}', [ItemController::class, 'edit']);
     Route::get('/sell', [ItemController::class, 'create']);
     Route::post('/', [ItemController::class, 'store']);
-    Route::get('/purchase/success/{item_id}', [ItemController::class, 'success'])->name('purchase.success');
-    Route::get('/purchase/cancel/{item_id}', [ItemController::class, 'cancel'])->name('purchase.cancel');
 });
 
 Route::post('/register', [AuthController::class,'store']);
