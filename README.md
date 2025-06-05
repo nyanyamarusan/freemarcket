@@ -22,6 +22,7 @@ Laravel環境構築
 - PHP 8.3-fpm
 - Laravel 12.14.1
 - MySQL 8.0.41
+- nginx 1.26.3
 - Fortify
 - mailhog
 - Stripe

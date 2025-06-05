@@ -9,7 +9,11 @@
     <div class="profile">
         <div class="profile__inner">
             <div class="profile__image">
+                @if ($user->image)
                 <img src="{{ asset('storage/profile-img/' . $user->image) }}" class="profile__image--img">
+                @else
+                <span class="profile__image--none"></span>
+                @endif
             </div>
             <p class="user__name">{{ $user->name }}</p>
             <a href="/mypage/profile" class="profile__link">プロフィールを編集</a>

@@ -225,9 +225,3 @@
     font-family: 'Inter';
     font-weight: 700;
 }
-
-@media (min-width: 768px) and (max-width: 850px) {
-    .content__inner {
-        padding: 4% 20% 0;
-    }
-}

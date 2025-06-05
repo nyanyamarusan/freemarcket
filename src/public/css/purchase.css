@@ -227,3 +227,9 @@
 .error {
     color: red;
 }
+
+@media (min-width: 768px) and (max-width: 850px) {
+    .custom-select__trigger {
+        padding: 1% 2%;
+    }
+}

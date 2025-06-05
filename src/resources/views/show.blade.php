@@ -26,7 +26,7 @@
                             @csrf
                             @method('PATCH')
                             <button type="submit" class="like__icon
-                            {{ auth()->user() && auth()->user()->likedItems->contains($item->id) ? 'liked' : '' }}">
+                            {{ auth()->user() && auth()->user()->likes?->contains($item->id) ? 'liked' : '' }}">
                                 <img src="{{ asset('icon/like.png') }}" class="icon__img">
                                 <span class="icon__text">★</span>
                             </button>

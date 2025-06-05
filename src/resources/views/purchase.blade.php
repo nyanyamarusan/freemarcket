@@ -21,21 +21,20 @@
             </div>
             <div class="payment">
                 <label for="payment_method_id" class="payment__label">支払い方法</label>
-                    <select name="payment_method_id" id="payment_method_id" class="payment__select">
-                        <option value="" class="select__placeholder" disabled selected hidden>選択してください</option>
+                <select name="payment_method_id" id="payment_method_id" class="payment__select">
+                    <option value="" class="select__placeholder" disabled selected hidden>選択してください</option>
+                    @foreach ($paymentMethods as $paymentMethod)
+                    <option value="{{ $paymentMethod->id}}" class="payment__option">{{ $paymentMethod->name }}</option>
+                    @endforeach
+                </select>
+                <div class="custom-select">
+                    <div class="custom-select__trigger">選択してください</div>
+                    <div class="custom-options">
                         @foreach ($paymentMethods as $paymentMethod)
-                        <option value="{{ $paymentMethod->id}}" class="payment__option">{{ $paymentMethod->name }}</option>
+                        <div class="custom-option" data-value="{{ $paymentMethod->id }}">{{ $paymentMethod->name }}</div>
                         @endforeach
-                    </select>
-                    <div class="custom-select">
-                        <div class="custom-select__trigger">選択してください</div>
-                        <div class="custom-options">
-                            @foreach ($paymentMethods as $paymentMethod)
-                            <div class="custom-option" data-value="{{ $paymentMethod->id }}">{{ $paymentMethod->name }}</div>
-                            @endforeach
-                        </div>
                     </div>
-                </form>
+                </div>
                 @error('payment_method_id')
                     <p class="error">{{ $message }}</p>
                 @enderror

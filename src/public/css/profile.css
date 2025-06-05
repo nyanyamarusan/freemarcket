@@ -20,12 +20,21 @@
 }
 
 .profile__image {
-    width: 20%;
+    width: clamp(50px, 9.92vw, 180px);
 }
 
 .profile__image--img {
     width: 100%;
     border-radius: 50%;
+}
+
+.profile__image--none {
+    width: 100%;
+    border-radius: 50%;
+    border: none;
+    background-color: #D9D9D9;
+    height: clamp(50px, 9.92vw, 180px);
+    display: inline-block;
 }
 
 .user__name {

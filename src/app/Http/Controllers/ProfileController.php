@@ -10,7 +10,7 @@ class ProfileController extends Controller
 {
     public function index(Request $request)
     {
-        $tab = $request->query('tab', 'sell');
+        $tab = $request->query('page', 'sell');
         $user = auth()->user();
         $purchasedItems = $user->purchases()->with('item')->get();
         $soldItems = $user->items()->get();

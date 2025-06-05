@@ -4,6 +4,8 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Item;
+use App\Models\Status;
+use App\Models\User;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Item>
@@ -24,8 +26,8 @@ class ItemFactory extends Factory
             'brand' => $this->faker->company(),
             'price' => $this->faker->numberBetween(100, 100000),
             'image' => $this->faker->imageUrl(640, 480, 'items', true),
-            'user_id' => $this->faker->numberBetween(1, 10),
-            'status_id' => $this->faker->numberBetween(1, 4),
+            'user_id' => User::factory(),
+            'status_id' => Status::factory(),
             'sold' => false,
             'description' => $this->faker->text(255),
         ];

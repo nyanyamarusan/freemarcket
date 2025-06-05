@@ -3,6 +3,8 @@
 namespace Database\Factories;
 
 use App\Models\Comment;
+use App\Models\Item;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,8 +23,8 @@ class CommentFactory extends Factory
     {
         return [
             'content' => $this->faker->text(255),
-            'user_id' => $this->faker->numberBetween(1, 10),
-            'item_id' => $this->faker->numberBetween(1, 10),
+            'user_id' => User::factory(),
+            'item_id' => Item::factory(),
         ];
     }
 }

@@ -3,7 +3,7 @@
     max-width: 1800px;
     font-family: 'Inter';
     font-weight: 700;
-    font-size: clamp(18px, 1.58vw, 28px);
+    font-size: clamp(16px, 1.58vw, 28px);
     color: #000;
     text-align: center;
 }

@@ -179,11 +179,13 @@
 .item-info__table--th {
     width: 28%;
     padding-bottom: 4%;
+    font-size: clamp(16px, 1.58vw, 28px);
+
 }
 
 .item-info__table--td {
     padding-bottom: 4%;
-    font-size: clamp(16px, 1.32vw, 24px);
+    font-size: clamp(10px, 1.32vw, 24px);
     font-weight: 400;
 }
 

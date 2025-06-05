@@ -25,13 +25,12 @@ class ItemController extends Controller
 
         if ($tab === 'mylist') {
             $items = auth()->check()
-                ? auth()->user()->likes->map(function ($like) use ($keyword) {
-                    $item = $like->item;
+                ? auth()->user()->likes->map(function ($item) use ($keyword) {
                     if ($item->user_id === auth()->id()) {
                         return null;
                     }
                     return $keyword && !str_contains($item->name, $keyword) ? null : $item;
-                })->filter()
+                })->filter()->values()
                 : collect();
         } else {
             $userId = auth()->id();
@@ -59,7 +58,7 @@ class ItemController extends Controller
     public function like($itemId)
     {
         $item = Item::findOrFail($itemId);
-        $user = auth()->user();
+        $user = auth()->user()->load('likes');
 
         if ($item->isLikedBy($user)) {
             $item->likedUsers()->detach($user->id);
@@ -99,11 +98,16 @@ class ItemController extends Controller
         }
 
         $user = auth()->user();
-        $method = $request->payment_method_id;
+        $paymentMethod = PaymentMethod::find($request->payment_method_id);
+        $paymentMethodMap = [
+            'カード支払い' => 'card',
+            'コンビニ支払い' => 'konbini',
+        ];
+        $stripePaymentMethod = $paymentMethodMap[$paymentMethod->name];
 
         Stripe::setApiKey(config('services.stripe.secret'));
         $session = CheckoutSession::create([
-            'payment_method_types' => [$method],
+            'payment_method_types' => [$stripePaymentMethod],
             'line_items' => [[
                 'price_data' => [
                     'currency' => 'jpy',
@@ -117,13 +121,13 @@ class ItemController extends Controller
             'mode' => 'payment',
             'customer_email' => $user->email,
             'success_url' => route('purchase.success', [
-                'itemId' => $item->id,
+                'item_id' => $item->id,
                 'shipping_zipcode' => $request->shipping_zipcode,
                 'shipping_address' => $request->shipping_address,
                 'shipping_building' => $request->shipping_building,
-                'payment_method_id' => $method,
+                'payment_method_id' => $paymentMethod->id,
             ]),
-            'cancel_url' => route('purchase.cancel', ['itemId' => $item->id]),
+            'cancel_url' => route('purchase.cancel', ['item_id' => $item->id]),
         ]);
     
         return redirect($session->url);
@@ -162,9 +166,10 @@ class ItemController extends Controller
         return redirect('/');
     }
 
-    public function edit()
+    public function edit($itemId)
     {
-        return view('address');
+        $item = Item::findOrFail($itemId);
+        return view('address', compact('item'));
     }
 
     public function update(AddressRequest $request, $itemId)
@@ -183,7 +188,7 @@ class ItemController extends Controller
         );
 
         return redirect('/purchase/' . $item->id)
-            ->withInput($purchase);
+            ->withInput($purchase, $item);
     }
 
     public function create()

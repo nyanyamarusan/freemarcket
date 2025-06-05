@@ -77,9 +77,3 @@
     font-weight: 400;
     font-size: clamp(16px, 1.32vw, 24px);
 }
-
-@media (min-width: 768px) and (max-width: 850px) {
-    .content__inner {
-        padding: 8% 20% 0;
-    }
-}
