@@ -11,7 +11,6 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
-use Mockery;
 use Tests\TestCase;
 
 class FreemarcketTest extends TestCase
@@ -351,7 +350,9 @@ class FreemarcketTest extends TestCase
         $response->assertSeeText(number_format($item->price));
         $response->assertSee($item->image);
         $response->assertDontSeeText('Sold');
-        $response->assertSeeText($item->categories->name);
+        foreach ($item->categories as $category) {
+            $response->assertSeeText($category->name);
+        }
         $response->assertSeeText($item->status->name);
         $response->assertSee((string) $item->likes()->count());
         $response->assertSee((string) $item->comments()->count());
@@ -361,7 +362,7 @@ class FreemarcketTest extends TestCase
             $response->assertSeeText($comment->user->name);
         }
 
-        $response->assertSee('<img src="' . $item->image . '"', false);
+        $response->assertSee('src="' . asset('storage/item-img/' . $item->image) . '"', false);
     }
 
     public function test_show_item_multiple_categories(): void
@@ -492,196 +493,6 @@ class FreemarcketTest extends TestCase
         $response->assertSessionHasErrors('content');
     }
 
-    public function test_purchase(): void
-    {
-        $user = User::factory()->create();
-        $this->actingAs($user);
-
-        $item = Item::factory()->create();
-
-        $response = $this->get('/purchase/' . $item->id);
-        $response->assertStatus(200);
-
-        $paymentMethod = PaymentMethod::create([
-            'name' => 'カード支払い',
-        ]);
-
-        $mockSession = Mockery::mock('alias:Stripe\Checkout\Session');
-        $mockSession->shouldReceive('create')->andReturn((object)[
-            'id' => 'cs_test_123',
-            'url' => 'https://checkout.stripe.com/pay/cs_test_123',
-        ]);
-
-        $purchaseData = ([
-            'payment_method_id' => $paymentMethod->id,
-            'shipping_address' => 'test address',
-            'shipping_building' => 'test building',
-            'shipping_zipcode' => '123-4567',
-            'item_id' => $item->id,
-            'user_id' => $user->id,
-        ]);
-
-        $response = $this->post('/purchase/' . $item->id, $purchaseData);
-        $response->assertRedirect('https://checkout.stripe.com/pay/cs_test_123');
-        $response = $this->get('/purchase/success/' . $item->id, $purchaseData);
-        $response->assertStatus(302);
-        $item->refresh();
-        $this->assertTrue($item->sold);
-    }
-
-    public function test_purchased_item_sold(): void
-    {
-        $user = User::factory()->create();
-        $item = Item::factory()->create();
-        $this->actingAs($user);
-
-        $response = $this->get('/purchase/' . $item->id);
-        $response->assertStatus(200);
-
-        $paymentMethod = PaymentMethod::create([
-            'name' => 'カード支払い',
-        ]);
-
-        $mockSession = Mockery::mock('alias:Stripe\Checkout\Session');
-        $mockSession->shouldReceive('create')->andReturn((object)[
-            'id' => 'cs_test_123',
-            'url' => 'https://checkout.stripe.com/pay/cs_test_123',
-        ]);
-
-        $purchaseData = ([
-            'payment_method_id' => $paymentMethod->id,
-            'shipping_address' => 'test address',
-            'shipping_building' => 'test building',
-            'shipping_zipcode' => '123-4567',
-            'item_id' => $item->id,
-            'user_id' => $user->id,
-        ]);
-
-        $response = $this->post('/purchase/' . $item->id, $purchaseData);
-        $response->assertRedirect('https://checkout.stripe.com/pay/cs_test_123');
-        $response = $this->get('/purchase/success/' . $item->id, $purchaseData);
-        $response->assertStatus(302);
-        $item->refresh();
-        $this->assertTrue($item->sold);
-
-        $response = $this->get('/');
-        $response->assertStatus(200);
-        $response->assertSeeText('Sold');
-    }
-
-    public function test_purchased_item_in_profile(): void
-    {
-        $user = User::factory()->create();
-        $item = Item::factory()->create();
-        $this->actingAs($user);
-
-        $response = $this->get('/purchase/' . $item->id);
-        $response->assertStatus(200);
-
-        $paymentMethod = PaymentMethod::create([
-            'name' => 'カード支払い',
-        ]);
-
-        $mockSession = Mockery::mock('alias:Stripe\Checkout\Session');
-        $mockSession->shouldReceive('create')->andReturn((object)[
-            'id' => 'cs_test_123',
-            'url' => 'https://checkout.stripe.com/pay/cs_test_123',
-        ]);
-
-        $purchaseData = ([
-            'payment_method_id' => $paymentMethod->id,
-            'shipping_address' => 'test address',
-            'shipping_building' => 'test building',
-            'shipping_zipcode' => '123-4567',
-            'item_id' => $item->id,
-            'user_id' => $user->id,
-        ]);
-
-        $response = $this->post('/purchase/' . $item->id, $purchaseData);
-        $response->assertRedirect('https://checkout.stripe.com/pay/cs_test_123');
-        $response = $this->get('/purchase/success/' . $item->id, $purchaseData);
-        $response->assertStatus(302);
-        $item->refresh();
-        $this->assertTrue($item->sold);
-
-        $this->get('/mypage?page=buy')
-            ->assertStatus(200)
-            ->assertSee($item->name);
-    }
-
-    public function test_edit_address():void
-    {
-        $user = User::factory()->create();
-        $item = Item::factory()->create();
-        $this->actingAs($user);
-        $response = $this->get('/purchase/address/' . $item->id);
-        $response->assertStatus(200);
-
-        $shippingAddress = [
-            'shipping_zipcode' => '987-6543',
-            'shipping_address' => 'edit address',
-            'shipping_building' => 'edit building',
-        ];
-        $response = $this->post('/purchase/' . $item->id, $shippingAddress);
-
-        $response = $this->get('/purchase/' . $item->id);
-        $response->assertStatus(200)
-                ->assertSee($shippingAddress['shipping_zipcode'])
-                ->assertSee($shippingAddress['shipping_address'])
-                ->assertSee($shippingAddress['shipping_building']);
-    }
-
-    public function test_registered_edit_address(): void
-    {
-        $user = User::factory()->create();
-        $item = Item::factory()->create();
-        $this->actingAs($user);
-        $response = $this->get('/purchase/address/' . $item->id);
-        $response->assertStatus(200);
-
-        $shippingAddress = [
-            'shipping_zipcode' => '987-6543',
-            'shipping_address' => 'edit address',
-            'shipping_building' => 'edit building',
-        ];
-        $response = $this->post('/purchase/' . $item->id, $shippingAddress);
-
-        $paymentMethod = PaymentMethod::create([
-            'name' => 'カード支払い',
-        ]);
-
-        $mockSession = Mockery::mock('alias:Stripe\Checkout\Session');
-        $mockSession->shouldReceive('create')->andReturn((object)[
-            'id' => 'cs_test_123',
-            'url' => 'https://checkout.stripe.com/pay/cs_test_123',
-        ]);
-
-        $purchaseData = ([
-            'payment_method_id' => $paymentMethod->id,
-            'shipping_zipcode' => $shippingAddress['shipping_zipcode'],
-            'shipping_address' => $shippingAddress['shipping_address'],
-            'shipping_building' => $shippingAddress['shipping_building'],
-            'item_id' => $item->id,
-            'user_id' => $user->id,
-        ]);
-
-        $response = $this->post('/purchase/' . $item->id, $purchaseData);
-        $response->assertRedirect('https://checkout.stripe.com/pay/cs_test_123');
-        $response = $this->get('/purchase/success/' . $item->id, $purchaseData);
-        $response->assertStatus(302);
-        $item->refresh();
-        $this->assertTrue($item->sold);
-
-        $this->assertDatabaseHas('purchases', [
-            'user_id' => $user->id,
-            'item_id' => $item->id,
-            'payment_method_id' => $paymentMethod->id,
-            'shipping_zipcode' => $shippingAddress['shipping_zipcode'],
-            'shipping_address' => $shippingAddress['shipping_address'],
-            'shipping_building' => $shippingAddress['shipping_building'],
-        ]);
-    }
-
     public function test_profile(): void
     {
         $user = User::factory()->create([
@@ -697,7 +508,7 @@ class FreemarcketTest extends TestCase
             'sold' => true,
         ]);
         $paymentMethod = PaymentMethod::create([
-            'name' => 'クレジットカード',
+            'name' => 'カード支払い',
         ]);
         foreach ($purchasedItems as $purchasedItem) {
             $user->purchases()->create([

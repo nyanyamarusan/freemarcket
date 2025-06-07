@@ -87,7 +87,7 @@
                             <img src="{{ asset('storage/user-img/' . $comment->user->image) }}" class="user__icon">
                             <p class="user__name">{{ $comment->user->name }}</p>
                         </div>
-                        <p class="comment__text">{{ $comment->text }}</p>
+                        <p class="comment__text">{{ $comment->content }}</p>
                     @endforeach
                 </div>
                 <form action="/item/{{ $item->id }}" method="post" class="comment-form">
