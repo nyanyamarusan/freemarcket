@@ -1,0 +1,227 @@
+.content {
+    margin: 0 auto;
+    max-width: 1800px;
+    font-family: 'Inter';
+    font-weight: 700;
+    font-size: clamp(18px, 1.58vw, 28px);
+    color: #000;
+}
+
+.content__inner {
+    padding: 4% 25% 0;
+}
+
+.content__title {
+    font-size: clamp(24px, 2.38vw, 42px);
+    text-align: center;
+    margin: 0 auto;
+}
+
+.form {
+    margin: 0 auto;
+    width: 100%;
+}
+
+.form__group {
+    margin-top: 5%;
+    width: 100%;
+    position: relative;
+}
+
+.form__image {
+    border: 1px dotted #5F5F5F;
+    border-radius: 4px;
+    height: clamp(100px, 9.92vw, 180px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.form__image--img {
+    width: 100%;
+}
+
+.form__image--input {
+    display: none;
+}
+
+.form__image--label {
+    color: #FF5555;
+    border: 2px solid #FF5555;
+    border-radius: 10px;
+    text-decoration: none;
+    padding: 1% 3%;
+    font-size: clamp(12px, 1.06vw, 20px);
+    cursor: pointer;
+}
+
+.form__title {
+    font-size: clamp(24px, 1.98vw, 36px);
+    color: #5F5F5F;
+    border-bottom: 1px solid #5F5F5F;
+    padding-bottom: 1%;
+    margin: 8% 0 0;
+}
+
+.form__label {
+    width: 100%;
+    display: block;
+    margin-bottom: 1%;
+}
+
+.category__label {
+    display: inline-block;
+    border: 2px solid #FF5655;
+    color: #FF5655;
+    padding: 0.5% 2.5%;
+    border-radius: 200px;
+    margin: 2% 1%;
+    cursor: pointer;
+    font-size: clamp(12px, 0.99vw, 20px);
+    font-weight: 500;
+}
+
+.category__group {
+    padding: 0 1%;
+}
+
+.category__checkbox {
+    display: none;
+}
+
+.category__checkbox:checked + .category__label {
+    background-color: #FF5655;
+    color: #fff;
+}
+
+.status__select {
+    display: none;
+}
+
+.custom-select {
+    width: 100%;
+    position: relative;
+    border: 1px solid #5F5F5F;
+    border-radius: 4px;
+    cursor: pointer;
+    user-select: none;
+    margin-top: 4%;
+    box-sizing: border-box;
+}
+
+.custom-select__trigger {
+    font-size: clamp(12px, 1.06vw, 20px);
+    color: #5F5F5F;
+    padding: 1% 2%;
+    position: relative;
+}
+
+.custom-select__trigger::after {
+    content: "▼";
+    font-size: clamp(10px, 0.86vw, 18px);
+    color: #5F5F5F;
+    position: absolute;
+    transform: scaleY(1.1);
+    top: 25%;
+    right: 2%;
+}
+
+.custom-options {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: -1px;
+    right: 0;
+    border: 1.5px solid #B1B1B1;
+    border-radius: 5px;
+    background: #636769;
+    width: calc(100% + 2px);
+}
+
+.custom-option {
+    padding: 0 3%;
+    color: #fff;
+    font-size: clamp(10px, 0.79vw, 16px);
+    font-weight: 600;
+    margin: 0.5%;
+    border-radius: 5px;
+    border: none;
+    position: relative;
+}
+
+.custom-option:hover {
+    background: #5599EB;
+    color: #fff;
+}
+
+.custom-option:hover::after {
+    content: "✔";
+    position: absolute;
+    left: 1%;
+    top: 5%;
+    transform: scaleX(1.5);
+    font-size: clamp(10px, 0.79vw, 16px);
+    color: #fff;
+}
+
+.form__input {
+    width: 100%;
+    padding: 1.5% 2%;
+    border-radius: 4px;
+    border: 1px solid #5f5f5f;
+    background-color: #fff;
+    color: #5f5f5f;
+    font-size: clamp(12px, 1.06vw, 20px);
+    font-weight: 700;
+    font-family: 'Inter';
+}
+
+.form__textarea {
+    width: 100%;
+    height: clamp(100px, 9.92vw, 180px);
+    padding: 1% 2%;
+    border-radius: 4px;
+    border: 1px solid #5f5f5f;
+    background-color: #fff;
+    color: #5f5f5f;
+    font-size: clamp(12px, 1.06vw, 20px);
+    font-weight: 700;
+    font-family: 'Inter';
+}
+
+.price__symbol {
+    position: absolute;
+    left: 1.5%;
+    transform: translateY(8%);
+}
+
+.form__input--price {
+    width: 100%;
+    padding: 1.5% 2% 1.5% 4%;
+    border-radius: 4px;
+    border: 1px solid #5f5f5f;
+    background-color: #fff;
+    color: #5f5f5f;
+    font-size: clamp(12px, 1.06vw, 20px);
+    font-weight: 700;
+    font-family: 'Inter';
+}
+
+.error {
+    color: red;
+}
+
+.form__button {
+    width: 100%;
+    border-radius: 4px;
+    border: none;
+    background-color: #ff5555;
+    color: #fff;
+    cursor: pointer;
+    text-align: center;
+    font-size: clamp(18px, 1.72vw, 30px);
+    padding: 2%;
+    margin-top: 15%;
+    font-family: 'Inter';
+    font-weight: 700;
+}

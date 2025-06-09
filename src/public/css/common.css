@@ -1,0 +1,126 @@
+.header {
+    background-color: #000;
+}
+
+.header__inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1% 2%;
+    max-width: 1800px;
+    font-weight: 400;
+    font-family: "Inter";
+    color: #fff;
+    font-size: clamp(15px, 1.58vw, 28px);
+    margin: 0 auto;
+}
+
+.header__logo {
+    width: 25%;
+}
+
+.header__logo--img {
+    width: 100%;
+}
+
+.header__search {
+    width: 35%;
+}
+
+.search-form {
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.search-form__input {
+    width: 85%;
+    padding: 2% 5%;
+    margin-right: 2%;
+    border-radius: 5px;
+    border: none;
+    background-color: #fff;
+    color: #000;
+    font-size: clamp(14px, 1.58vw, 28px);
+}
+
+.search-form__input::placeholder {
+    color: #000;
+    opacity: 1;
+}
+
+.search-form__button {
+    width: 15%;
+    padding: 1% 2%;
+    border-radius: 5px;
+    border: none;
+    background-color: #fff;
+    cursor: pointer;
+    color: #000;
+    font-family: "Inter";
+    font-size: clamp(12px, 1.32vw, 28px);
+}
+
+.header__nav {
+    width: 25%;
+}
+
+.nav__ul {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+}
+
+.nav-list {
+    text-align: center;
+}
+
+.logout-button {
+    width: 100%;
+    border: none;
+    color: #fff;
+    background-color: transparent;
+    cursor: pointer;
+    font-size: clamp(14px, 1.58vw, 28px);
+    padding: 0;
+}
+
+.nav-item {
+    text-decoration: none;
+    cursor: pointer;
+    width: 100%;
+    display: block;
+    color: #fff;
+}
+
+.nav-list--sell {
+    width: 22%;
+    text-align: center;
+}
+
+.nav-item--sell {
+    background-color: #fff;
+    color: #000;
+    padding: 2% 10%;
+    border-radius: 5px;
+    border: none;
+    text-decoration: none;
+    cursor: pointer;
+    width: 100%;
+    display: block;
+}
+
+.nav-item:visited {
+    color: #fff;
+}
+
+.nav-item--sell:visited {
+    color: #000;
+}
+
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+    .header__nav {
+        width: 27%;
+    }
+}
