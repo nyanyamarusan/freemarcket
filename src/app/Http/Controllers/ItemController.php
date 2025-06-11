@@ -60,9 +60,9 @@ class ItemController extends Controller
         $user = auth()->user()->load('likes');
 
         if ($item->isLikedBy($user)) {
-            $item->likedUsers()->detach($user->id);
+            $item->likes()->detach($user->id);
         } else {
-            $item->likedUsers()->attach($user->id);
+            $item->likes()->attach($user->id);
         }
 
         return redirect()->back();
@@ -100,7 +100,7 @@ class ItemController extends Controller
         $paymentMethod = PaymentMethod::find($request->payment_method_id);
         $paymentMethodMap = [
             'カード支払い' => 'card',
-            'コンビニ支払い' => 'konbini',
+            'コンビニ払い' => 'konbini',
         ];
         $stripePaymentMethod = $paymentMethodMap[$paymentMethod->name];
 
@@ -113,7 +113,7 @@ class ItemController extends Controller
                     'product_data' => [
                         'name' => $item->name,
                     ],
-                    'unit_amount' => $item->price * 100,
+                    'unit_amount' => $item->price,
                 ],
                 'quantity' => 1,
             ]],
@@ -127,8 +127,8 @@ class ItemController extends Controller
                 'shipping_building' => $request->shipping_building,
                 'payment_method_id' => $paymentMethod->id,
             ],
-            'success_url' => ('/'),
-            'cancel_url' => ('/'),
+            'success_url' => url('/'),
+            'cancel_url' => url('/'),
         ]);
     
         return redirect($session->url);
@@ -154,18 +154,14 @@ class ItemController extends Controller
             $session = $event->data->object;
             $metadata = $session->metadata;
 
-            Purchase::updateOrCreate(
-                [
+            Purchase::create([
                     'user_id' => $metadata->user_id,
                     'item_id' => $metadata->item_id,
-                ],
-                [
                     'payment_method_id' => $metadata->payment_method_id,
                     'shipping_zipcode' => $metadata->shipping_zipcode,
                     'shipping_address' => $metadata->shipping_address,
                     'shipping_building' => $metadata->shipping_building,
-                ]
-            );
+            ]);
         
             Item::find($metadata->item_id)->update(['sold' => true]);
         }
@@ -182,20 +178,14 @@ class ItemController extends Controller
     public function update(AddressRequest $request, $itemId)
     {
         $item = Item::findOrFail($itemId);
-        $purchase = Purchase::updateOrCreate(
-            [
-                'user_id' => auth()->user()->id,
-                'item_id' => $item->id,
-            ],
-            $request->only([
+        $purchase = $request->only([
                 'shipping_zipcode',
                 'shipping_address',
                 'shipping_building',
-            ])
-        );
+        ]);
 
         return redirect('/purchase/' . $item->id)
-            ->withInput($purchase, $item);
+            ->withInput($purchase);
     }
 
     public function create()

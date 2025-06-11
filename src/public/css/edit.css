@@ -36,19 +36,21 @@
 
 .form__image {
     width: clamp(50px, 9.92vw, 180px);
+    height: clamp(50px, 9.92vw, 180px);
 }
 
 .form__image--img {
     width: 100%;
+    height: 100%;
     border-radius: 50%;
 }
 
 .form__image--none {
     width: 100%;
+    height: 100%;
     border-radius: 50%;
     border: none;
     background-color: #D9D9D9;
-    height: clamp(50px, 9.92vw, 180px);
     display: inline-block;
 }
 

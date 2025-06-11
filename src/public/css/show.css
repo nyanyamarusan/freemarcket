@@ -215,14 +215,24 @@
 
 .comment__user {
     display: flex;
-    gap: 2%;
+    gap: 4%;
     align-items: center;
     padding: 4% 0 3%;
 }
 
 .user__icon {
-    width: 10%;
+    width: clamp(40px, 4.63vw, 120px);
+    height: clamp(40px, 4.63vw, 120px);
     border-radius: 50%;
+}
+
+.user__icon--none {
+    width: clamp(40px, 4.63vw, 120px);
+    height: clamp(40px, 4.63vw, 120px);
+    border-radius: 50%;
+    border: none;
+    background-color: #D9D9D9;
+    display: inline-block;
 }
 
 .user__name {

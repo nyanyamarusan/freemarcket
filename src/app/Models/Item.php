@@ -51,12 +51,12 @@ class Item extends Model
 
     public function isLikedBy($user)
     {
-        return $this->likedUsers()->where('user_id', $user->id)->exists();
+        return $this->likes()->where('user_id', $user->id)->exists();
     }
 
     public function likesCount()
     {
-        return $this->likedUsers()->count();
+        return $this->likes()->count();
     }
 
     public function purchase()

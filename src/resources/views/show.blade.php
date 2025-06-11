@@ -84,7 +84,11 @@
                 <div class="comment-list">
                     @foreach ($comments as $comment)
                         <div class="comment__user">
-                            <img src="{{ asset('storage/user-img/' . $comment->user->image) }}" class="user__icon">
+                            @if ($comment->user->image)
+                            <img src="{{ asset('storage/profile-img/' . $comment->user->image) }}" class="user__icon">
+                            @else
+                            <span class="user__icon--none"></span>
+                            @endif
                             <p class="user__name">{{ $comment->user->name }}</p>
                         </div>
                         <p class="comment__text">{{ $comment->content }}</p>

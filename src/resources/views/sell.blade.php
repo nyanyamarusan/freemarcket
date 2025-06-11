@@ -71,11 +71,17 @@
             <div class="form__group">
                 <label for="description" class="form__label">商品の説明</label>
                 <textarea name="description" id="description" class="form__textarea">{{ old('description') }}</textarea>
+                @error('description')
+                    <p class="error">{{ $message }}</p>
+                @enderror
             </div>
             <div class="form__group">
                 <label for="price" class="form__label">販売価格</label>
                 <span class="price__symbol">¥</span>
                 <input type="text" name="price" id="price" class="form__input--price" value="{{ old('price') }}">
+                @error('price')
+                    <p class="error">{{ $message }}</p>
+                @enderror
             </div>
             <button type="submit" class="form__button">出品する</button>
         </form>
