@@ -21,6 +21,7 @@ class ItemController extends Controller
     {
         $tab = $request->query('page', 'recommend');
         $keyword = $request->query('keyword');
+        $queryString = $keyword ? '&keyword=' . $keyword : '';
 
         if ($tab === 'mylist') {
             $items = auth()->check()
@@ -40,7 +41,7 @@ class ItemController extends Controller
                 ->get();
         }
 
-        return view('index', compact('items', 'tab', 'keyword'));
+        return view('index', compact('items', 'tab', 'keyword', 'queryString'));
     }
 
     public function show($itemId)

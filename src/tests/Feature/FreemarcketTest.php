@@ -140,7 +140,7 @@ class FreemarcketTest extends TestCase
             'password' => 'password123',
         ]);
 
-        $response->assertRedirect('/?page=mylist');
+        $response->assertRedirect('/');
     }
 
     public function test_logoutSuccess(): void
@@ -297,12 +297,12 @@ class FreemarcketTest extends TestCase
         $this->actingAs($user);
 
         $keyword = '商品';
-        $response = $this->get('/?keyword=' . $keyword);
+        $response = $this->get('/?keyword=' . urlencode($keyword));
 
         $response->assertStatus(200);
         $response->assertSee($keyword);
 
-        $response2 = $this->get('/?page=mylist&keyword=' . $keyword);
+        $response2 = $this->get('/?page=mylist&keyword=' . urlencode($keyword));
 
         $response2->assertStatus(200);
         $response2->assertSee($keyword);

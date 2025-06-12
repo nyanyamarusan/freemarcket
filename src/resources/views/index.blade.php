@@ -11,7 +11,7 @@
             <a href="/" class="{{ $tab === 'recommend' ? 'active-tab' : 'inactive-tab' }}">
                 おすすめ
             </a>
-            <a href="/?page=mylist&keyword={{ $keyword }}" class="{{ $tab === 'mylist' ? 'active-tab' : 'inactive-tab' }}">
+            <a href="/?page=mylist{{ $queryString }}" class="{{ $tab === 'mylist' ? 'active-tab' : 'inactive-tab' }}">
                 マイリスト
             </a>
         </div>
