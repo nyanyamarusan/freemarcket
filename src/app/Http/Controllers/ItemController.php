@@ -128,46 +128,45 @@ class ItemController extends Controller
                 'shipping_building' => $request->shipping_building,
                 'payment_method_id' => $paymentMethod->id,
             ],
-            'success_url' => url('/'),
-            'cancel_url' => url('/'),
+            'success_url' => url('/payment/success?session_id={CHECKOUT_SESSION_ID}'),
         ]);
-    
+
         return redirect($session->url);
     }
 
     public function success(Request $request)
     {
-        $payload = $request->getContent();
-        $sigHeader = $request->header('Stripe-Signature');
-        $endpointSecret = config('services.stripe.webhook_secret');
-
-        if (app()->environment('testing')) {
-            $event = json_decode($payload);
-        } else {
-            try {
-                $event = \Stripe\Webhook::constructEvent($payload, $sigHeader, $endpointSecret);
-            } catch (\Exception $e) {
-                return response('Invalid signature', 400);
-            }
+        $sessionId = $request->query('session_id');
+        if (!$sessionId) {
+            return redirect('/');
         }
 
-        if ($event->type === 'checkout.session.completed') {
-            $session = $event->data->object;
-            $metadata = $session->metadata;
+        Stripe::setApiKey(config('services.stripe.secret'));
 
-            Purchase::create([
-                    'user_id' => $metadata->user_id,
-                    'item_id' => $metadata->item_id,
-                    'payment_method_id' => $metadata->payment_method_id,
-                    'shipping_zipcode' => $metadata->shipping_zipcode,
-                    'shipping_address' => $metadata->shipping_address,
-                    'shipping_building' => $metadata->shipping_building,
-            ]);
-        
-            Item::find($metadata->item_id)->update(['sold' => true]);
+        try {
+            $session = CheckoutSession::retrieve($sessionId);
+        } catch (\Exception $e) {
+            return redirect('/');
         }
 
-        return response('Webhook received', 200);
+        if ($session->payment_status !== 'paid') {
+            return redirect('/');
+        }
+
+        $metadata = $session->metadata;
+
+        Purchase::create([
+            'user_id' => $metadata->user_id,
+            'item_id' => $metadata->item_id,
+            'payment_method_id' => $metadata->payment_method_id,
+            'shipping_zipcode' => $metadata->shipping_zipcode,
+            'shipping_address' => $metadata->shipping_address,
+            'shipping_building' => $metadata->shipping_building,
+        ]);
+
+        Item::find($metadata->item_id)->update(['sold' => true]);
+
+        return redirect('/');
     }
 
     public function edit($itemId)

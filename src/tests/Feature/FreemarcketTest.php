@@ -508,47 +508,45 @@ class FreemarcketTest extends TestCase
             'name' => 'カード支払い',
         ]);
 
-        $mockSession = Mockery::mock('alias:Stripe\Checkout\Session');
-        $mockSession->shouldReceive('create')->andReturn((object)[
-            'id' => 'cs_test_123',
-            'url' => 'https://checkout.stripe.com/pay/cs_test_123',
-        ]);
-
-        $purchaseData = ([
+        $purchaseData = [
             'payment_method_id' => $paymentMethod->id,
             'shipping_address' => 'test address',
             'shipping_building' => 'test building',
             'shipping_zipcode' => '123-4567',
             'item_id' => $item->id,
             'user_id' => $user->id,
+        ];
+
+        $mockSession = Mockery::mock('alias:Stripe\Checkout\Session');
+        $mockSession->shouldReceive('create')->andReturn((object)[
+            'id' => 'cs_test_123',
+            'url' => 'https://checkout.stripe.com/pay/cs_test_123',
+        ]);
+        $mockSession->shouldReceive('retrieve')->with('cs_test_123')->andReturn((object)[
+            'id' => 'cs_test_123',
+            'metadata' => (object)[
+                'user_id' => (string)$user->id,
+                'item_id' => (string)$item->id,
+                'payment_method_id' => (string)$paymentMethod->id,
+                'shipping_zipcode' => $purchaseData['shipping_zipcode'],
+                'shipping_address' => $purchaseData['shipping_address'],
+                'shipping_building' => $purchaseData['shipping_building'],
+            ],
+            'payment_status' => 'paid',
         ]);
 
         $response = $this->post('/purchase/' . $item->id, $purchaseData);
         $response->assertRedirect('https://checkout.stripe.com/pay/cs_test_123');
 
-        $webhookPayload = [
-            'id' => 'evt_test_123',
-            'object' => 'event',
-            'type' => 'checkout.session.completed',
-            'data' => [
-                'object' => [
-                    'id' => 'cs_test_123',
-                    'metadata' => (object)[
-                        'user_id' => (string)$user->id,
-                        'item_id' => (string)$item->id,
-                        'payment_method_id' => (string)$paymentMethod->id,
-                        'shipping_zipcode' => $purchaseData['shipping_zipcode'],
-                        'shipping_address' => $purchaseData['shipping_address'],
-                        'shipping_building' => $purchaseData['shipping_building'],
-                    ],
-                ],
-            ],
-        ];
-    
-        $response = $this->postJson('/stripe/webhook', $webhookPayload);
-        $response->assertStatus(200);
+        $response = $this->get('/payment/success?session_id=cs_test_123');
+        $response->assertRedirect('/');
+
         $item->refresh();
         $this->assertTrue($item->sold);
+
+        $this->assertDatabaseHas('purchases', [
+            'item_id' => $item->id,
+        ]);
     }
 
     public function test_purchased_item_sold(): void
@@ -564,12 +562,6 @@ class FreemarcketTest extends TestCase
             'name' => 'カード支払い',
         ]);
 
-        $mockSession = Mockery::mock('alias:Stripe\Checkout\Session');
-        $mockSession->shouldReceive('create')->andReturn((object)[
-            'id' => 'cs_test_123',
-            'url' => 'https://checkout.stripe.com/pay/cs_test_123',
-        ]);
-
         $purchaseData = ([
             'payment_method_id' => $paymentMethod->id,
             'shipping_address' => 'test address',
@@ -579,30 +571,30 @@ class FreemarcketTest extends TestCase
             'user_id' => $user->id,
         ]);
 
+        $mockSession = Mockery::mock('alias:Stripe\Checkout\Session');
+        $mockSession->shouldReceive('create')->andReturn((object)[
+            'id' => 'cs_test_123',
+            'url' => 'https://checkout.stripe.com/pay/cs_test_123',
+        ]);
+        $mockSession->shouldReceive('retrieve')->with('cs_test_123')->andReturn((object)[
+            'id' => 'cs_test_123',
+            'metadata' => (object)[
+                'user_id' => (string)$user->id,
+                'item_id' => (string)$item->id,
+                'payment_method_id' => (string)$paymentMethod->id,
+                'shipping_zipcode' => $purchaseData['shipping_zipcode'],
+                'shipping_address' => $purchaseData['shipping_address'],
+                'shipping_building' => $purchaseData['shipping_building'],
+            ],
+            'payment_status' => 'paid',
+        ]);
+
         $response = $this->post('/purchase/' . $item->id, $purchaseData);
         $response->assertRedirect('https://checkout.stripe.com/pay/cs_test_123');
 
-        $webhookPayload = [
-            'id' => 'evt_test_123',
-            'object' => 'event',
-            'type' => 'checkout.session.completed',
-            'data' => [
-                'object' => [
-                    'id' => 'cs_test_123',
-                    'metadata' => (object)[
-                        'user_id' => (string)$user->id,
-                        'item_id' => (string)$item->id,
-                        'payment_method_id' => (string)$paymentMethod->id,
-                        'shipping_zipcode' => $purchaseData['shipping_zipcode'],
-                        'shipping_address' => $purchaseData['shipping_address'],
-                        'shipping_building' => $purchaseData['shipping_building'],
-                    ],
-                ],
-            ],
-        ];
-    
-        $response = $this->postJson('/stripe/webhook', $webhookPayload);
-        $response->assertStatus(200);
+        $response = $this->get('/payment/success?session_id=cs_test_123');
+        $response->assertRedirect('/');
+
         $item->refresh();
         $this->assertTrue($item->sold);
 
@@ -625,12 +617,6 @@ class FreemarcketTest extends TestCase
             'name' => 'カード支払い',
         ]);
 
-        $mockSession = Mockery::mock('alias:Stripe\Checkout\Session');
-        $mockSession->shouldReceive('create')->andReturn((object)[
-            'id' => 'cs_test_123',
-            'url' => 'https://checkout.stripe.com/pay/cs_test_123',
-        ]);
-
         $purchaseData = ([
             'payment_method_id' => $paymentMethod->id,
             'shipping_address' => 'test address',
@@ -640,30 +626,30 @@ class FreemarcketTest extends TestCase
             'user_id' => $user->id,
         ]);
 
+        $mockSession = Mockery::mock('alias:Stripe\Checkout\Session');
+        $mockSession->shouldReceive('create')->andReturn((object)[
+            'id' => 'cs_test_123',
+            'url' => 'https://checkout.stripe.com/pay/cs_test_123',
+        ]);
+        $mockSession->shouldReceive('retrieve')->with('cs_test_123')->andReturn((object)[
+            'id' => 'cs_test_123',
+            'metadata' => (object)[
+                'user_id' => (string)$user->id,
+                'item_id' => (string)$item->id,
+                'payment_method_id' => (string)$paymentMethod->id,
+                'shipping_zipcode' => $purchaseData['shipping_zipcode'],
+                'shipping_address' => $purchaseData['shipping_address'],
+                'shipping_building' => $purchaseData['shipping_building'],
+            ],
+            'payment_status' => 'paid',
+        ]);
+
         $response = $this->post('/purchase/' . $item->id, $purchaseData);
         $response->assertRedirect('https://checkout.stripe.com/pay/cs_test_123');
 
-        $webhookPayload = [
-            'id' => 'evt_test_123',
-            'object' => 'event',
-            'type' => 'checkout.session.completed',
-            'data' => [
-                'object' => [
-                    'id' => 'cs_test_123',
-                    'metadata' => (object)[
-                        'user_id' => (string)$user->id,
-                        'item_id' => (string)$item->id,
-                        'payment_method_id' => (string)$paymentMethod->id,
-                        'shipping_zipcode' => $purchaseData['shipping_zipcode'],
-                        'shipping_address' => $purchaseData['shipping_address'],
-                        'shipping_building' => $purchaseData['shipping_building'],
-                    ],
-                ],
-            ],
-        ];
-    
-        $response = $this->postJson('/stripe/webhook', $webhookPayload);
-        $response->assertStatus(200);
+        $response = $this->get('/payment/success?session_id=cs_test_123');
+        $response->assertRedirect('/');
+
         $item->refresh();
         $this->assertTrue($item->sold);
 
@@ -713,12 +699,6 @@ class FreemarcketTest extends TestCase
             'name' => 'カード支払い',
         ]);
 
-        $mockSession = Mockery::mock('alias:Stripe\Checkout\Session');
-        $mockSession->shouldReceive('create')->andReturn((object)[
-            'id' => 'cs_test_123',
-            'url' => 'https://checkout.stripe.com/pay/cs_test_123',
-        ]);
-
         $purchaseData = ([
             'payment_method_id' => $paymentMethod->id,
             'shipping_zipcode' => $shippingAddress['shipping_zipcode'],
@@ -728,30 +708,30 @@ class FreemarcketTest extends TestCase
             'user_id' => $user->id,
         ]);
 
+        $mockSession = Mockery::mock('alias:Stripe\Checkout\Session');
+        $mockSession->shouldReceive('create')->andReturn((object)[
+            'id' => 'cs_test_123',
+            'url' => 'https://checkout.stripe.com/pay/cs_test_123',
+        ]);
+        $mockSession->shouldReceive('retrieve')->with('cs_test_123')->andReturn((object)[
+            'id' => 'cs_test_123',
+            'metadata' => (object)[
+                'user_id' => (string)$user->id,
+                'item_id' => (string)$item->id,
+                'payment_method_id' => (string)$paymentMethod->id,
+                'shipping_zipcode' => $purchaseData['shipping_zipcode'],
+                'shipping_address' => $purchaseData['shipping_address'],
+                'shipping_building' => $purchaseData['shipping_building'],
+            ],
+            'payment_status' => 'paid',
+        ]);
+
         $response = $this->post('/purchase/' . $item->id, $purchaseData);
         $response->assertRedirect('https://checkout.stripe.com/pay/cs_test_123');
 
-        $webhookPayload = [
-            'id' => 'evt_test_123',
-            'object' => 'event',
-            'type' => 'checkout.session.completed',
-            'data' => [
-                'object' => [
-                    'id' => 'cs_test_123',
-                    'metadata' => (object)[
-                        'user_id' => (string)$user->id,
-                        'item_id' => (string)$item->id,
-                        'payment_method_id' => (string)$paymentMethod->id,
-                        'shipping_zipcode' => $purchaseData['shipping_zipcode'],
-                        'shipping_address' => $purchaseData['shipping_address'],
-                        'shipping_building' => $purchaseData['shipping_building'],
-                    ],
-                ],
-            ],
-        ];
-    
-        $response = $this->postJson('/stripe/webhook', $webhookPayload);
-        $response->assertStatus(200);
+        $response = $this->get('/payment/success?session_id=cs_test_123');
+        $response->assertRedirect('/');
+
         $item->refresh();
         $this->assertTrue($item->sold);
 
@@ -865,5 +845,10 @@ class FreemarcketTest extends TestCase
             'category_id' => $category->id,
         ]);
     }
-}
 
+    protected function tearDown(): void
+    {
+        Mockery::close();
+        parent::tearDown();
+    }
+}

@@ -13,7 +13,7 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::post('/item/{item_id}', [ItemController::class, 'comment']);
     Route::get('/purchase/{item_id}', [ItemController::class, 'purchase']);
     Route::post('/purchase/{item_id}', [ItemController::class, 'buy']);
-    Route::post('/stripe/webhook', [ItemController::class, 'success']);
+    Route::get('/payment/success', [ItemController::class, 'success'])->name('payment.success');
     Route::patch('/purchase/{item_id}', [ItemController::class, 'update']);
     Route::get('/purchase/address/{item_id}', [ItemController::class, 'edit']);
     Route::get('/sell', [ItemController::class, 'create']);
