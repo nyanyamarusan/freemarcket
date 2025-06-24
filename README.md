@@ -14,6 +14,9 @@ Laravel 環境構築
 1.  docker-compose exec php bash
 2.  composer install
 3.  .env.example ファイルから.env を作成し、環境変数を変更
+    ＊ .env のロケール設定は、以下のように変更してください。
+    - APP_LOCALE=ja
+    - APP_FAKER_LOCALE=ja_JP
 4.  php artisan key:generate
 5.  php artisan migrate
 6.  php artisan db:seed
