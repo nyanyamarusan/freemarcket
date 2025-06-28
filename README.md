@@ -15,8 +15,12 @@ Laravel 環境構築
 2.  composer install
 3.  .env.example ファイルから.env を作成し、環境変数を変更  
     ＊ .env のロケール設定は、以下のように変更してください。
+
     - APP_LOCALE=ja
     - APP_FAKER_LOCALE=ja_JP
+
+    ＊ もし、変更後に設定が反映されていなかった場合、php artisan config:clear で、キャッシュクリアしてみてください。
+
 4.  php artisan key:generate
 5.  php artisan migrate
 6.  php artisan db:seed
