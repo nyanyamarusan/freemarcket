@@ -15,6 +15,8 @@ Laravel 環境構築
 2.  composer install
 3.  .env.example ファイルから.env を作成し、環境変数を変更  
     ＊ .env のロケール設定は、以下のように変更してください。
+     APP_LOCALE=ja
+     APP_FAKER_LOCALE=ja_JP
 
     - APP_LOCALE=ja
     - APP_FAKER_LOCALE=ja_JP
@@ -49,3 +51,14 @@ Laravel 環境構築
 ## Laravel Dusk について
 
 - Dusk テスト実行時は .env.dusk.local にて APP_URL=http://host.docker.internal に設定してください。これは Docker コンテナからホストの Laravel サーバーへアクセスするための URL です。
+
+## mailhog環境変数
+
+- MAIL_MAILER=smtp
+- MAIL_SCHEME=null
+- MAIL_HOST=mailhog
+- MAIL_PORT=1025
+- MAIL_USERNAME=null
+- MAIL_PASSWORD=null
+- MAIL_FROM_ADDRESS="hello@example.com"
+- MAIL_FROM_NAME="${APP_NAME}"
