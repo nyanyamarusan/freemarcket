@@ -90,7 +90,7 @@ class ItemsTableSeeder extends Seeder
             'price' => 8000,
             'description' => '高音質のレコーディング用マイク',
             'image' => 'Music+Mic+4632231.jpeg',
-            'user_id' => 1,
+            'user_id' => 2,
             'status_id' => 2,
         ];
         $itemId = DB::table('items')->insertGetId($param);
@@ -104,7 +104,7 @@ class ItemsTableSeeder extends Seeder
             'price' => 3500,
             'description' => 'おしゃれなショルダーバッグ',
             'image' => 'Purse+fashion+pocket.jpeg',
-            'user_id' => 1,
+            'user_id' => 2,
             'status_id' => 3,
         ];
         $itemId = DB::table('items')->insertGetId($param);
@@ -118,7 +118,7 @@ class ItemsTableSeeder extends Seeder
             'price' => 500,
             'description' => '使いやすいタンブラー',
             'image' => 'Tumbler+souvenir.jpeg',
-            'user_id' => 1,
+            'user_id' => 2,
             'status_id' => 4,
         ];
         $itemId = DB::table('items')->insertGetId($param);
@@ -132,7 +132,7 @@ class ItemsTableSeeder extends Seeder
             'price' => 4000,
             'description' => '手動のコーヒーミル',
             'image' => 'Waitress+with+Coffee+Grinder.jpeg',
-            'user_id' => 1,
+            'user_id' => 2,
             'status_id' => 1,
         ];
         $itemId = DB::table('items')->insertGetId($param);
@@ -146,7 +146,7 @@ class ItemsTableSeeder extends Seeder
             'price' => 2500,
             'description' => '便利なメイクアップセット',
             'image' => '外出メイクアップセット.jpeg',
-            'user_id' => 1,
+            'user_id' => 2,
             'status_id' => 2,
         ];
         $itemId = DB::table('items')->insertGetId($param);
