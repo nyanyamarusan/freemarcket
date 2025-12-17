@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('buyer_id')->constrained('users')->onDelete('cascade');
             $table->string('status')->default('in_progress');
             $table->timestamps();
+            $table->timestamp('latest_message_at')->nullable();
         });
     }
 

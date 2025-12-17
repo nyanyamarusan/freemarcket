@@ -27,6 +27,14 @@
             <a href="/mypage?page=buy" class="{{ $tab === 'buy' ? 'active-tab' : 'inactive-tab' }}">
                 購入した商品
             </a>
+            <div class="transaction">
+                <a href="/mypage?page=transaction" class="{{ $tab === 'transaction' ? 'active-tab' : 'inactive-tab' }}">
+                    取引中の商品
+                </a>
+                @if ($totalCount > 0)
+                <span class="total-count">{{ $totalCount }}</span>
+                @endif
+            </div>
         </div>
     </div>
 </div>
@@ -55,6 +63,18 @@
                     @endif
                 </div>
                 <p class="item-name">{{ $item->name }}</p>
+            </a>
+            @endforeach
+        @endif
+        @if ($tab === 'transaction')
+            @foreach ($transactions as $transaction)
+            <a href="/transaction/{{ $transaction->id }}" class="item-card">
+                <div class="item-image">
+                    <img class="item-image__img" src="{{ asset('storage/item-img/' . $transaction->item->image) }}">
+                    @isset ($count[$transaction->id])
+                        <span class="count">{{ $count[$transaction->id] }}</span>
+                    @endisset
+                </div>
             </a>
             @endforeach
         @endif

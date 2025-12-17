@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Message;
+use App\Models\Transaction;
 use App\Http\Requests\ProfileRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
@@ -15,7 +18,29 @@ class ProfileController extends Controller
         $purchasedItems = $user->purchases()->with('item')->get()->pluck('item');
         $soldItems = $user->items()->get();
 
-        return view('profile', compact('user', 'purchasedItems', 'soldItems', 'tab'));
+        $transactions = Transaction::where(function ($q) use ($user) {
+                $q->where('seller_id', $user->id)
+                ->orWhere('buyer_id', $user->id);
+            })
+            ->where('status', 'in_progress')
+            ->orderByDesc(
+            Message::select('created_at')
+                ->whereColumn('messages.transaction_id', 'transactions.id')
+                ->where('is_read', false)
+                ->where('user_id', '!=', $user->id)
+                ->orderByDesc('created_at')
+                ->limit(1)
+            )
+            ->orderByDesc('latest_message_at')
+            ->get();
+
+        $totalCount = Message::unread($user->id)->count();
+        $count = Message::unread($user->id)
+            ->select('transaction_id', DB::raw('COUNT(*) as unread_count'))
+            ->groupBy('transaction_id')
+            ->pluck('unread_count', 'transaction_id');
+
+        return view('profile', compact('user', 'purchasedItems', 'soldItems', 'tab', 'transactions', 'totalCount', 'count'));
     }
 
     public function edit()

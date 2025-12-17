@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth', 'verified')->group(function () {
@@ -18,6 +19,10 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::get('/purchase/address/{item_id}', [ItemController::class, 'edit']);
     Route::get('/sell', [ItemController::class, 'create']);
     Route::post('/', [ItemController::class, 'store']);
+    Route::get('/transaction/{transaction_id}', [TransactionController::class, 'index']);
+    Route::post('/transaction/{transaction_id}/message', [TransactionController::class, 'message']);
+    Route::patch('/message/{message_id}', [TransactionController::class, 'update']);
+    Route::delete('/message/{message_id}', [TransactionController::class, 'destroy']);
 });
 
 Route::post('/register', [AuthController::class,'store']);

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Message;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -18,6 +19,35 @@ class DatabaseSeeder extends Seeder
             StatusesTableSeeder::class,
             ItemsTableSeeder::class,
             PaymentMethodsTableSeeder::class,
+            TransactionsTableSeeder::class,
         ]);
+
+        Message::factory(2)->create(
+            [
+                'transaction_id' => 1,
+                'user_id' => 2,
+            ]
+        );
+        Message::factory(2)->create(
+            [
+                'transaction_id' => 1,
+                'user_id' => 2,
+                'is_read' => true,
+            ]
+        );
+
+        Message::factory(2)->create(
+            [
+                'transaction_id' => 2,
+                'user_id' => 2,
+            ]
+        );
+
+        Message::factory(2)->create(
+            [
+                'transaction_id' => 2,
+                'user_id' => 1,
+            ]
+        );
     }
 }

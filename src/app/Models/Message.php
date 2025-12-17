@@ -26,4 +26,14 @@ class Message extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function scopeUnread($query, int $userId)
+    {
+        return $query
+            ->whereHas('transaction', function ($query) use ($userId) {
+                $query->where('seller_id', $userId)->orWhere('buyer_id', $userId);
+            })
+            ->where('user_id', '!=', $userId)
+            ->where('is_read', false);
+    }
 }
