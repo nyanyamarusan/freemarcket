@@ -57,10 +57,6 @@ class TransactionController extends Controller
 
         Message::create($messageData);
 
-        $transaction->update([
-            'latest_message_at' => now(),
-        ]);
-
         return redirect()->back();
     }
 

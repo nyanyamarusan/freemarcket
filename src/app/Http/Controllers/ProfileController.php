@@ -24,14 +24,12 @@ class ProfileController extends Controller
             })
             ->where('status', 'in_progress')
             ->orderByDesc(
-            Message::select('created_at')
-                ->whereColumn('messages.transaction_id', 'transactions.id')
-                ->where('is_read', false)
-                ->where('user_id', '!=', $user->id)
-                ->orderByDesc('created_at')
-                ->limit(1)
+                Message::unread($user->id)
+                    ->select('created_at')
+                    ->whereColumn('messages.transaction_id', 'transactions.id')
+                    ->latest()
+                    ->limit(1)
             )
-            ->orderByDesc('latest_message_at')
             ->get();
 
         $totalCount = Message::unread($user->id)->count();

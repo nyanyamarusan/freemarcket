@@ -8,7 +8,7 @@
 <div class="content">
     <div class="sidebar">
         <p class="transaction-list__title">その他の取引</p>
-        <ul>
+        <ul class="transaction-list">
             @foreach ($transactions as $transaction)
             @if ($transaction->id !== $selectedTransaction->id)
             <li class="transaction-list__item">
@@ -21,79 +21,110 @@
         </ul>
     </div>
     <div class="main">
-        <div class="title__container">
+        <div class="title-content">
             <div class="title">
-                <div class="message__user">
-                    @if ($partner->image)
-                    <img src="{{ asset('storage/profile-img/' . $partner->image) }}" class="user__icon">
-                    @else
-                    <span class="user__icon--none"></span>
-                    @endif
-                    <h2 class="user__name">「{{ $partner->name }}」さんとの取引画面</h2>
-                </div>
+                @if ($partner->image)
+                <img src="{{ asset('storage/profile-img/' . $partner->image) }}" class="user__icon">
+                @else
+                <span class="user__icon--none"></span>
+                @endif
+                <h2 class="user__name">「{{ $partner->name }}」さんとの取引画面</h2>
+            </div>
+            <form action="" method="post" class="completed-form">
+                @csrf
+                @method('PATCH')
                 <div class="button">
-                    <button class="button__completed">取引を完了する</button>
+                    <button class="button__completed" type="submit">取引を完了する</button>
+                </div>
+            </form>
+        </div>
+        <div class="item">
+            <div class="item__image">
+                <img src="{{ asset('storage/item-img/' . $selectedTransaction->item->image) }}" class="item__image--img">
+            </div>
+            <div class="item__info">
+                <p class="item__name">{{ $selectedTransaction->item->name }}</p>
+                <span class="yen">¥</span>
+                <p class="item__price">{{ number_format($selectedTransaction->item->price) }}</p>
+            </div>
+        </div>
+        <div class="message-list">
+            @foreach ($messages as $message)
+            @php
+            $isMe = $message->user_id === auth()->user()->id;
+            @endphp
+            @if ($isMe)
+            <div class="message--me">
+                <div class="message">
+                    <div class="message__user--me">
+                        <p class="message__user-name">{{ $message->user->name }}</p>
+                        @if ($message->user->image)
+                        <div class="message__user-icon">
+                            <img src="{{ asset('storage/profile-img/' . $message->user->image) }}" class="message__user-icon--img">
+                        </div>
+                        @else
+                        <span class="message__user-icon--none"></span>
+                        @endif
+                    </div>
+                    <form action="/message/{{ $message->id }}" method="post" class="message-update-form">
+                        @csrf
+                        @method('PATCH')
+                        @if ($message->image)
+                        <div class="message__image">
+                            <img src="{{ asset('storage/message-img/' . $message->image) }}" class="message__image--img">
+                        </div>
+                        @endif
+                        <input type="text" name="message" value="{{ $message->message }}" class="message-update-form__input">
+                        <div class="form-button">
+                            <button type="submit" class="message-form__button">編集</button>
+                        </div>
+                    </form>
+                    <form action="/message/{{ $message->id }}" method="post" class="message-delete-form">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="message-form__button">削除</button>
+                    </form>
                 </div>
             </div>
-            <div class="item">
-                <div class="item__image">
-                    <img src="{{ asset('storage/item-img/' . $selectedTransaction->item->image) }}" class="item__image--img">
-                </div>
-                <div class="item__info">
-                    <p class="item__name">{{ $selectedTransaction->item->name }}</p>
-                    <span class="yen">¥</span>
-                    <p class="item__price">{{ number_format($selectedTransaction->item->price) }}</p>
-                </div>
-            </div>
-            <div class="message-list">
-                @foreach ($messages as $message)
-                @php
-                $isMe = $message->user_id === auth()->user()->id;
-                @endphp
-                <div class="message {{ $isMe ? 'message--me' : 'message--partner' }}">
+            @else
+            <div class="message--partner">
+                <div class="message">
                     <div class="message__user">
                         @if ($message->user->image)
-                        <img src="{{ asset('storage/profile-img/' . $message->user->image) }}" class="user__icon">
+                        <div class="message__user-icon">
+                            <img src="{{ asset('storage/profile-img/' . $message->user->image) }}" class="message__user-icon--img">
+                        </div>
                         @else
-                        <span class="user__icon--none"></span>
+                        <span class="message__user-icon--none"></span>
                         @endif
-                        <p class="user__name">{{ $message->user->name }}</p>
+                        <p class="message__user-name">{{ $message->user->name }}</p>
                     </div>
-                    <p class="message__text">{{ $message->message }}</p>
                     @if ($message->image)
                     <div class="message__image">
                         <img src="{{ asset('storage/message-img/' . $message->image) }}" class="message__image--img">
                     </div>
                     @endif
-                    @if ($isMe)
-                        <div class="form">
-                            <form action="/message/{{ $message->id }}" method="post" class="message-form">
-                                @csrf
-                                @method('PATCH')
-                                <button type="submit" class="message-form__button">編集</button>
-                            </form>
-                            <form action="/message/{{ $message->id }}" method="post" class="message-form">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="message-form__button">削除</button>
-                            </form>
-                        </div>
-                    @endif
+                    <p class="message__text">{{ $message->message }}</p>
                 </div>
-                @endforeach
             </div>
+            @endif
+            @endforeach
+        </div>
+        <div class="message-form-container">
             <form action="/transaction/{{ $selectedTransaction->id }}/message" method="post" class="message-form" enctype="multipart/form-data">
                 @csrf
-                <input type="text" name="message" id="message" class="message-form__input">
+                <input type="text" name="message" id="message" class="message-form__input" placeholder="取引メッセージを記入してください">
                 @error('message')
                 <p class="error">{{ $message }}</p>
                 @enderror
                 <input type="file" name="image" id="image" class="message-form__file">
-                <label for="image" class="form__image--label">画像を追加する</label>
+                <label for="image" class="message-form__label">画像を追加</label>
                 @error('image')
                 <p class="error">{{ $message }}</p>
                 @enderror
-                <button type="submit" class="message-form__button">送信</button>
+                <button type="submit" class="message-form__send-button">
+                    <img src="{{ asset('icon/send.jpg') }}" class="send-icon">
+                </button>
             </form>
         </div>
     </div>

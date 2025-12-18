@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             [
                 'transaction_id' => 1,
                 'user_id' => 2,
+                'created_at' => now()->subDay(),
             ]
         );
         Message::factory(2)->create(
@@ -40,6 +41,7 @@ class DatabaseSeeder extends Seeder
             [
                 'transaction_id' => 2,
                 'user_id' => 2,
+                'created_at' => now(),
             ]
         );
 
