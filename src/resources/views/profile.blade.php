@@ -15,7 +15,19 @@
                 <span class="profile__image--none"></span>
                 @endif
             </div>
-            <p class="user__name">{{ $user->name }}</p>
+            <div class="user__info">
+                <p class="user__name">{{ $user->name }}</p>
+                @if ($user->average_rating !== null)
+                <div class="rating" data-rating="{{ $user->average_rating }}">
+                    @for ($i = 1; $i <= 5; $i++)
+                    <span class="star {{ $i <= $user->average_rating ? 'is-active' : '' }}">
+                        ★
+                    </span>
+                    @endfor
+                </div>
+                @endif
+            </div>
+
             <a href="/mypage/profile" class="profile__link">プロフィールを編集</a>
         </div>
     </div>

@@ -22,9 +22,9 @@ class TransactionFactory extends Factory
     public function definition(): array
     {
         return [
-            'item_id' => Item::factory(),
-            'seller_id' => User::factory(),
-            'buyer_id' => User::factory(),
+            'item_id' => Item::inRandomOrder()->value('id'),
+            'seller_id' => User::inRandomOrder()->value('id'),
+            'buyer_id' => User::inRandomOrder()->value('id'),
             'status' => 'in_progress',
         ];
     }

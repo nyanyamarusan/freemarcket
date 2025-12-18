@@ -16,7 +16,7 @@
     padding: 5% 20%;
     display: flex;
     align-items: center;
-    gap: 10%;
+    gap: 4%;
 }
 
 .profile__image {
@@ -39,8 +39,22 @@
     display: inline-block;
 }
 
+.user__info {
+    text-align: center;
+}
+
 .user__name {
     font-size: clamp(24px, 2.38vw, 42px);
+    margin: 0;
+}
+
+.star {
+    color: #D9D9D9;
+    font-size: clamp(32px, 2vw, 46px);
+}
+
+.star.is-active {
+    color: #FFF048;
 }
 
 .profile__link {

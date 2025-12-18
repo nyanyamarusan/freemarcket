@@ -23,8 +23,8 @@ class CommentFactory extends Factory
     {
         return [
             'content' => $this->faker->text(255),
-            'user_id' => User::factory(),
-            'item_id' => Item::factory(),
+            'user_id' => User::inRandomOrder()->value('id'),
+            'item_id' => Item::inRandomOrder()->value('id'),
         ];
     }
 }

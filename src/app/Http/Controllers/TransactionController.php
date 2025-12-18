@@ -41,7 +41,7 @@ class TransactionController extends Controller
         return view('transaction', compact('transactions', 'selectedTransaction', 'partner', 'messages'));
     }
 
-    public function message(Request $request, $transaction_id)
+    public function store(Request $request, $transaction_id)
     {
         $user = auth()->user();
         $transaction = Transaction::findOrFail($transaction_id);
@@ -66,12 +66,9 @@ class TransactionController extends Controller
             ->where('user_id', auth()->user()->id)
             ->firstOrFail();
 
-        $messageData =  $request->only('message', 'image');
+        $messageData = $request->only('message');
 
-        $message->update([
-            'message' => $messageData['message'],
-            'image' => $messageData['image'],
-        ]);
+        $message->update($messageData);
 
         return redirect()->back();
     }

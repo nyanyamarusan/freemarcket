@@ -30,7 +30,7 @@
                 @endif
                 <h2 class="user__name">「{{ $partner->name }}」さんとの取引画面</h2>
             </div>
-            <form action="" method="post" class="completed-form">
+            <form action="/transaction/{{ $selectedTransaction->id }}/complete" method="post" class="completed-form">
                 @csrf
                 @method('PATCH')
                 <div class="button">
@@ -66,14 +66,16 @@
                         <span class="message__user-icon--none"></span>
                         @endif
                     </div>
-                    <form action="/message/{{ $message->id }}" method="post" class="message-update-form">
-                        @csrf
-                        @method('PATCH')
-                        @if ($message->image)
+                    @if ($message->image)
+                    <div class="message__image-container">
                         <div class="message__image">
                             <img src="{{ asset('storage/message-img/' . $message->image) }}" class="message__image--img">
                         </div>
-                        @endif
+                    </div>
+                    @endif
+                    <form action="/message/{{ $message->id }}" method="post" class="message-update-form">
+                        @csrf
+                        @method('PATCH')
                         <input type="text" name="message" value="{{ $message->message }}" class="message-update-form__input">
                         <div class="form-button">
                             <button type="submit" class="message-form__button">編集</button>

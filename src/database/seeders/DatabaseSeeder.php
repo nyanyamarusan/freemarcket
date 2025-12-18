@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Evaluation;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -51,5 +52,11 @@ class DatabaseSeeder extends Seeder
                 'user_id' => 1,
             ]
         );
+
+        Evaluation::factory(3)->create();
+        Evaluation::factory(3)->create([
+            'evaluator_id' => 2,
+            'evaluatee_id' => 1,
+        ]);
     }
 }

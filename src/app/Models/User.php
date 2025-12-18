@@ -9,6 +9,7 @@ use App\Models\Message;
 use App\Models\Purchase;
 use App\Models\Transaction;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -90,8 +91,22 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Message::class);
     }
 
-    public function evaluations()
+    public function givenEvaluations()
     {
-        return $this->hasMany(Evaluation::class);
+        return $this->hasMany(Evaluation::class, 'evaluator_id');
+    }
+
+    public function receivedEvaluations()
+    {
+        return $this->hasMany(Evaluation::class, 'evaluatee_id');
+    }
+
+    protected function averageRating(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->receivedEvaluations()->exists()
+                ? round($this->receivedEvaluations()->avg('rating'))
+                : null
+        );
     }
 }

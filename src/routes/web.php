@@ -20,7 +20,8 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::get('/sell', [ItemController::class, 'create']);
     Route::post('/', [ItemController::class, 'store']);
     Route::get('/transaction/{transaction_id}', [TransactionController::class, 'index']);
-    Route::post('/transaction/{transaction_id}/message', [TransactionController::class, 'message']);
+    Route::patch('/transaction/{transaction_id}/complete', [TransactionController::class, 'complete']);
+    Route::post('/transaction/{transaction_id}/message', [TransactionController::class, 'store']);
     Route::patch('/message/{message_id}', [TransactionController::class, 'update']);
     Route::delete('/message/{message_id}', [TransactionController::class, 'destroy']);
 });

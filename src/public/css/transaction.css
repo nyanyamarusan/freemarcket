@@ -164,6 +164,11 @@
     margin: 0;
 }
 
+.message__image-container {
+    display: flex;
+    justify-content: flex-end;
+}
+
 .message__image {
     width: 80%;
     object-fit: cover;
