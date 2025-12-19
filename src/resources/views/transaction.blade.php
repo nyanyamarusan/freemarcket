@@ -30,7 +30,7 @@
                 @endif
                 <h2 class="user__name">「{{ $partner->name }}」さんとの取引画面</h2>
             </div>
-            <form action="/transaction/{{ $selectedTransaction->id }}/complete" method="post" class="completed-form">
+            <form action="/transaction/{{ $selectedTransaction->id }}/completed" method="post" class="completed-form">
                 @csrf
                 @method('PATCH')
                 <div class="button">
@@ -76,7 +76,7 @@
                     <form action="/message/{{ $message->id }}" method="post" class="message-update-form">
                         @csrf
                         @method('PATCH')
-                        <input type="text" name="message" value="{{ $message->message }}" class="message-update-form__input">
+                        <textarea name="message" class="message-update-form__textarea">{{ $message->message }}</textarea>
                         <div class="form-button">
                             <button type="submit" class="message-form__button">編集</button>
                         </div>
@@ -113,23 +113,24 @@
             @endforeach
         </div>
         <div class="message-form-container">
-            <form action="/transaction/{{ $selectedTransaction->id }}/message" method="post" class="message-form" enctype="multipart/form-data">
+            <form action="/transaction/{{ $selectedTransaction->id }}/message" method="post" enctype="multipart/form-data">
                 @csrf
-                <input type="text" name="message" id="message" class="message-form__input" placeholder="取引メッセージを記入してください">
                 @error('message')
                 <p class="error">{{ $message }}</p>
                 @enderror
-                <input type="file" name="image" id="image" class="message-form__file">
-                <label for="image" class="message-form__label">画像を追加</label>
                 @error('image')
                 <p class="error">{{ $message }}</p>
                 @enderror
-                <button type="submit" class="message-form__send-button">
-                    <img src="{{ asset('icon/send.jpg') }}" class="send-icon">
-                </button>
+                <div class="message-form">
+                    <textarea name="message" class="message-form__textarea" placeholder="取引メッセージを記入してください">{{ old('message', $sessionMessage) }}</textarea>
+                    <input type="file" name="image" id="image" class="message-form__file">
+                    <label for="image" class="message-form__label">画像を追加</label>
+                    <button type="submit" class="message-form__send-button">
+                        <img src="{{ asset('icon/send.jpg') }}" class="send-icon">
+                    </button>
+                </div>
             </form>
         </div>
     </div>
 </div>
-
 @endsection

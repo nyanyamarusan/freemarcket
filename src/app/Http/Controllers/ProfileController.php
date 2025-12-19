@@ -18,11 +18,9 @@ class ProfileController extends Controller
         $purchasedItems = $user->purchases()->with('item')->get()->pluck('item');
         $soldItems = $user->items()->get();
 
-        $transactions = Transaction::where(function ($q) use ($user) {
-                $q->where('seller_id', $user->id)
-                ->orWhere('buyer_id', $user->id);
-            })
-            ->where('status', 'in_progress')
+        $transactions = Transaction::query()
+            ->involvingUser($user->id)
+            ->unevaluatedBy($user->id)
             ->orderByDesc(
                 Message::unread($user->id)
                     ->select('created_at')

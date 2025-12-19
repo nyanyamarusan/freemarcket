@@ -42,4 +42,26 @@ class Transaction extends Model
     {
         return $this->hasMany(Evaluation::class);
     }
+
+    public function scopeInvolvingUser($query, int $userId)
+    {
+        return $query->where(function ($query) use ($userId) {
+            $query->where('seller_id', $userId)
+                ->orWhere('buyer_id', $userId);
+        });
+    }
+
+    public function scopeEvaluatedBy($query, int $userId)
+    {
+        return $query->whereHas('evaluations', function ($query) use ($userId) {
+            $query->where('evaluator_id', $userId);
+        });
+    }
+
+    public function scopeUnevaluatedBy($query, int $userId)
+    {
+        return $query->whereDoesntHave('evaluations', function ($query) use ($userId) {
+            $query->where('evaluator_id', $userId);
+        });
+    }
 }

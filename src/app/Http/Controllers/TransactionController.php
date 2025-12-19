@@ -4,26 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Models\Message;
 use App\Models\Transaction;
+use App\Http\Requests\MessageRequest;
 use Illuminate\Http\Request;
 
 class TransactionController extends Controller
 {
-    public function index($transaction_id)
+    public function index(Request $request, $transaction_id)
     {
         $user = auth()->user();
 
-        $baseQuery = Transaction::where(function ($q) use ($user) {
-            $q->where('seller_id', $user->id)
-            ->orWhere('buyer_id', $user->id);
-        });
+        $sessionMessage = $request->session()->get("session_message_{$transaction_id}");
 
-        $transactions = $baseQuery
-            ->where('status', 'in_progress')
+        $transactions = Transaction::query()
+            ->involvingUser($user->id)
+            ->unevaluatedBy($user->id)
             ->with(['seller', 'buyer'])
             ->get();
 
-        $selectedTransaction = $baseQuery
-            ->with(['seller', 'buyer'])
+        $selectedTransaction = Transaction::query()
+            ->involvingUser($user->id)
             ->where('id', $transaction_id)
             ->firstOrFail();
 
@@ -31,6 +30,7 @@ class TransactionController extends Controller
 
         $messages = Message::where('transaction_id', $transaction_id)
             ->with('user')
+            ->orderBy('created_at')
             ->get();
 
         Message::where('transaction_id', $transaction_id)
@@ -38,20 +38,33 @@ class TransactionController extends Controller
             ->where('is_read', false)
             ->update(['is_read' => true]);
 
-        return view('transaction', compact('transactions', 'selectedTransaction', 'partner', 'messages'));
+        return view('transaction', compact(
+            'sessionMessage',
+            'transactions',
+            'selectedTransaction',
+            'partner',
+            'messages'
+        ));
     }
 
-    public function store(Request $request, $transaction_id)
+    public function store(MessageRequest $request, $transaction_id)
     {
         $user = auth()->user();
-        $transaction = Transaction::findOrFail($transaction_id);
+        Transaction::findOrFail($transaction_id);
+
+        session()->put(
+            "session_message_{$transaction_id}",
+            $request->input('message')
+        );
 
         $messageData = $request->only([
             'message'
         ]);
 
-        $imagePath = $request->file('image')->store('message-img', 'public');
-        $messageData['image'] = basename($imagePath);
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('message-img', 'public');
+            $messageData['image'] = basename($imagePath);
+        }
         $messageData['user_id'] = $user->id;
         $messageData['transaction_id'] = $transaction_id;
 
@@ -60,25 +73,22 @@ class TransactionController extends Controller
         return redirect()->back();
     }
 
-    public function update(Request $request, $transaction_id)
+    public function update(Request $request, $message_id)
     {
-        $message = Message::where('transaction_id', $transaction_id)
-            ->where('user_id', auth()->user()->id)
-            ->firstOrFail();
-
+        $user = auth()->user();
+        $message = Message::findOrFail($message_id);
+        abort_unless($message->user_id === $user->id, 403);
         $messageData = $request->only('message');
-
         $message->update($messageData);
 
         return redirect()->back();
     }
 
-    public function destroy($transaction_id)
+    public function destroy($message_id)
     {
-        $message = Message::where('transaction_id', $transaction_id)
-            ->where('user_id', auth()->user()->id)
-            ->firstOrFail();
-
+        $user = auth()->user();
+        $message = Message::findOrFail($message_id);
+        abort_unless($message->user_id === $user->id, 403);
         $message->delete();
 
         return redirect()->back();

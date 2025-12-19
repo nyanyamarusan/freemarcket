@@ -14,6 +14,7 @@ class Message extends Model
         'transaction_id',
         'user_id',
         'message',
+        'image',
         'is_read',
     ];
 
