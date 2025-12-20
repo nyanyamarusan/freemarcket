@@ -504,4 +504,26 @@ class TransactionTest extends TestCase
             'id' => $message->id,
         ]);
     }
+
+    public function test_transaction_completed()
+    {
+        $user = User::factory()->create();
+        $partner = User::factory()->create();
+        $item = Item::factory()->create();
+        $transaction = Transaction::factory()->create([
+            'item_id' => $item->id,
+            'seller_id' => $partner->id,
+            'buyer_id' => $user->id,
+            'status' => 'in_progress',
+        ]);
+
+        $response = $this->actingAs($user)
+            ->patch('/transaction/' . $transaction->id . '/completed');
+        $response->assertRedirect();
+        $this->assertDatabaseHas('transactions', [
+            'id' => $transaction->id,
+            'status' => 'completed',
+        ]);
+    }
 }
+

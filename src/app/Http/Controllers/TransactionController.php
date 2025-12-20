@@ -39,6 +39,7 @@ class TransactionController extends Controller
             ->update(['is_read' => true]);
 
         return view('transaction', compact(
+            'user',
             'sessionMessage',
             'transactions',
             'selectedTransaction',
@@ -93,4 +94,19 @@ class TransactionController extends Controller
 
         return redirect()->back();
     }
+
+    public function completed($transaction_id)
+    {
+        $user = auth()->user();
+        $transaction = Transaction::findOrFail($transaction_id);
+        abort_unless($transaction->buyer_id === $user->id, 403);
+
+        if ($transaction->status === 'in_progress') {
+            $transaction->update(['status' => 'completed']);
+            //メール送信処理書く
+        }
+
+        return redirect()->back();
+    }
+
 }

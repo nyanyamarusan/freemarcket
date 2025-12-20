@@ -91,4 +91,107 @@ class EvaluationTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('data-rating="5"', false);
     }
+
+    public function test_show_evaluation_modal()
+    {
+        $user = User::factory()->create();
+        $partner = User::factory()->create();
+        $item = Item::factory()->create();
+        $transaction = Transaction::factory()->create([
+            'item_id' => $item->id,
+            'seller_id' => $partner->id,
+            'buyer_id' => $user->id,
+            'status' => 'completed',
+        ]);
+
+        $response = $this->actingAs($user)->get('/transaction/' . $transaction->id);
+        $response->assertStatus(200);
+
+        $response->assertSee('取引が完了しました。');
+
+        $response = $this->actingAs($partner)->get('/transaction/' . $transaction->id);
+        $response->assertStatus(200);
+
+        $response->assertSee('取引が完了しました。');
+    }
+
+    public function test_evaluation_modal_not_shown_for_in_progress_transaction()
+    {
+        $user = User::factory()->create();
+        $partner = User::factory()->create();
+        $item = Item::factory()->create();
+        $transaction = Transaction::factory()->create([
+            'item_id' => $item->id,
+            'seller_id' => $partner->id,
+            'buyer_id' => $user->id,
+            'status' => 'in_progress',
+        ]);
+
+        $response = $this->actingAs($user)->get('/transaction/' . $transaction->id);
+        $response->assertStatus(200);
+
+        $response->assertDontSee('取引が完了しました。');
+
+        $response = $this->actingAs($partner)->get('/transaction/' . $transaction->id);
+        $response->assertStatus(200);
+
+        $response->assertDontSee('取引が完了しました。');
+    }
+
+    public function test_store_evaluation()
+    {
+        $user = User::factory()->create();
+        $partner = User::factory()->create();
+        $item = Item::factory()->create();
+        $transaction = Transaction::factory()->create([
+            'item_id' => $item->id,
+            'seller_id' => $partner->id,
+            'buyer_id' => $user->id,
+            'status' => 'completed',
+        ]);
+
+        $response = $this->actingAs($user)->post('/evaluation/' . $transaction->id, [
+            'rating' => 5,
+        ]);
+        $response->assertRedirect('/');
+
+        $this->assertDatabaseHas('evaluations', [
+            'transaction_id' => $transaction->id,
+            'evaluator_id' => $user->id,
+            'evaluatee_id' => $partner->id,
+            'rating' => 5,
+        ]);
+    }
+
+    public function test_store_evaluation_only_for_unevaluated_transaction()
+    {
+        $user = User::factory()->create();
+        $partner = User::factory()->create();
+        $item = Item::factory()->create();
+        $transaction = Transaction::factory()->create([
+            'item_id' => $item->id,
+            'seller_id' => $partner->id,
+            'buyer_id' => $user->id,
+            'status' => 'completed',
+        ]);
+
+        Evaluation::factory()->create([
+            'transaction_id' => $transaction->id,
+            'evaluator_id' => $user->id,
+            'evaluatee_id' => $partner->id,
+            'rating' => 4,
+        ]);
+
+        $response = $this->actingAs($user)->post('/evaluation/' . $transaction->id, [
+            'rating' => 5,
+        ]);
+        $response->assertRedirect('/');
+
+        $this->assertDatabaseMissing('evaluations', [
+            'transaction_id' => $transaction->id,
+            'evaluator_id' => $user->id,
+            'evaluatee_id' => $partner->id,
+            'rating' => 5,
+        ]);
+    }
 }

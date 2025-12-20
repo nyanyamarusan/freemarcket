@@ -30,6 +30,7 @@
                 @endif
                 <h2 class="user__name">「{{ $partner->name }}」さんとの取引画面</h2>
             </div>
+            @if ($user->id === $selectedTransaction->buyer_id)
             <form action="/transaction/{{ $selectedTransaction->id }}/completed" method="post" class="completed-form">
                 @csrf
                 @method('PATCH')
@@ -37,6 +38,7 @@
                     <button class="button__completed" type="submit">取引を完了する</button>
                 </div>
             </form>
+            @endif
         </div>
         <div class="item">
             <div class="item__image">
@@ -131,6 +133,30 @@
                 </div>
             </form>
         </div>
+
+        @if ($selectedTransaction->status === 'completed' && $selectedTransaction->unevaluatedBy($user->id))
+        <div class="modal">
+            <p class="modal-text">
+                取引が完了しました。
+            </p>
+            <div class="rating">
+                <form action="/evaluation/{{ $selectedTransaction->id }}" class="rating-form" method="post">
+                    @csrf
+                    <p class="rating-text">今回の取引相手はどうでしたか？</p>
+                    <div class="rating-stars">
+                        @for($i = 5; $i >= 1; $i--)
+                        <input type="radio" id="star{{ $selectedTransaction->id }}_{{ $i }}" name="rating" value="{{ $i }}" class="rating-stars--input" required>
+                        <label for="star{{ $selectedTransaction->id }}_{{ $i }}" class="stars">★</label>
+                        @endfor
+                    </div>
+                    <div class="rating-form-button">
+                        <button type="submit" class="rating-button">送信する</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        @endif
+
     </div>
 </div>
 @endsection

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\EvaluationController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TransactionController;
@@ -19,11 +20,14 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::get('/purchase/address/{item_id}', [ItemController::class, 'edit']);
     Route::get('/sell', [ItemController::class, 'create']);
     Route::post('/', [ItemController::class, 'store']);
+
     Route::get('/transaction/{transaction_id}', [TransactionController::class, 'index']);
-    Route::patch('/transaction/{transaction_id}/completed', [TransactionController::class, 'completed']);
     Route::post('/transaction/{transaction_id}/message', [TransactionController::class, 'store']);
     Route::patch('/message/{message_id}', [TransactionController::class, 'update']);
     Route::delete('/message/{message_id}', [TransactionController::class, 'destroy']);
+    Route::patch('/transaction/{transaction_id}/completed', [TransactionController::class, 'completed']);
+
+    Route::post('/evaluation/{transaction_id}', [EvaluationController::class, 'store']);
 });
 
 Route::post('/register', [AuthController::class,'store']);
