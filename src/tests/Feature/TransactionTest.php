@@ -4,12 +4,14 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use App\Mail\TransactionCompletedMail;
 use App\Models\Evaluation;
 use App\Models\User;
 use App\Models\Item;
 use App\Models\Message;
 use App\Models\Transaction;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class TransactionTest extends TestCase
@@ -524,6 +526,33 @@ class TransactionTest extends TestCase
             'id' => $transaction->id,
             'status' => 'completed',
         ]);
+    }
+
+    public function test_send_transaction_completed_mail_only_to_seller()
+    {
+        Mail::fake();
+
+        $buyer = User::factory()->create();
+        $seller = User::factory()->create();
+        $item = Item::factory()->create();
+        $transaction = Transaction::factory()->create([
+            'item_id' => $item->id,
+            'seller_id' => $seller->id,
+            'buyer_id' => $buyer->id,
+            'status' => 'in_progress',
+        ]);
+
+        $this->actingAs($buyer)->patch('/transaction/' . $transaction->id . '/completed');
+
+        Mail::assertSent(TransactionCompletedMail::class, 1);
+
+        Mail::assertSent(TransactionCompletedMail::class, function ($mail) use ($seller) {
+            return $mail->hasTo($seller->email);
+        });
+
+        Mail::assertNotSent(TransactionCompletedMail::class, function ($mail) use ($buyer) {
+            return $mail->hasTo($buyer->email);
+        });
     }
 }
 

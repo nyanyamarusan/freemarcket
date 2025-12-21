@@ -53,10 +53,16 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        Evaluation::factory(3)->create();
-        Evaluation::factory(3)->create([
+        Evaluation::factory()->create([
             'evaluator_id' => 2,
             'evaluatee_id' => 1,
+            'transaction_id' => 4,
+        ]);
+
+        Evaluation::factory()->create([
+            'evaluator_id' => 2,
+            'evaluatee_id' => 1,
+            'transaction_id' => 5,
         ]);
     }
 }

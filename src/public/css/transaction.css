@@ -1,6 +1,7 @@
 .content {
     display: flex;
     font-family: 'Inter';
+    min-height: 100vh;
 }
 
 .sidebar {
@@ -34,7 +35,7 @@
 .transaction-list__link {
     text-decoration: none;
     color: #000;
-    font-size: clamp(18px, 1.58vw, 28px);
+    font-size: clamp(16px, 1.58vw, 28px);
 }
 
 .main {
@@ -111,7 +112,7 @@
 }
 
 .item__name {
-    font-size: clamp(30px, 3.17vw, 54px);
+    font-size: clamp(26px, 3.17vw, 54px);
     font-weight: 700;
     margin: 0;
 }
@@ -249,7 +250,7 @@
 
 .message-form__textarea {
     width: 75%;
-    padding: 6px 15px;
+    padding: 12px 15px;
     border-radius: 4px;
     border: 1px solid #5f5f5f;
     color: #7B7B7B;
@@ -259,11 +260,13 @@
     height: 44px;
     resize: none;
     overflow-y: auto;
+    line-height: 1;
 }
 
 .message-form__textarea::placeholder {
     color: #7B7B7B;
     opacity: 1;
+    line-height: 1;
 }
 
 .message-form__file {
@@ -358,4 +361,45 @@
     color: #fff;
     cursor: pointer;
     font-size: clamp(18px, 1.58vw, 28px);
+}
+
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+    .sidebar {
+        width: 20%;
+    }
+
+    .completed-form {
+        width: 20%;
+    }
+
+    .message__text {
+        padding: 10px 20px;
+    }
+
+    .message-update-form__textarea {
+        padding: 14px 20px 0;
+    }
+
+    .message-form__textarea {
+        height: 30px;
+        font-size: 14px;
+        line-height: 1;
+        padding: 8px 10px;
+    }
+
+    .message-form__textarea::placeholder {
+        color: #7B7B7B;
+        opacity: 1;
+        line-height: 1;
+    }
+
+    .form-button {
+        padding-right: 5%;
+    }
+}
+
+@media screen and (min-width: 820px) and (max-width: 1024px) {
+    .completed-form {
+        width: 18%;
+    }
 }

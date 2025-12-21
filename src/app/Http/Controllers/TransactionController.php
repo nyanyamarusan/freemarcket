@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\TransactionCompletedMail;
 use App\Models\Message;
 use App\Models\Transaction;
 use App\Http\Requests\MessageRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class TransactionController extends Controller
 {
@@ -103,10 +105,10 @@ class TransactionController extends Controller
 
         if ($transaction->status === 'in_progress') {
             $transaction->update(['status' => 'completed']);
-            //メール送信処理書く
+            Mail::to($transaction->seller->email)
+                ->send(new TransactionCompletedMail($transaction));
         }
 
         return redirect()->back();
     }
-
 }
