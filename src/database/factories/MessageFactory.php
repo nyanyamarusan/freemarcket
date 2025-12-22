@@ -24,7 +24,7 @@ class MessageFactory extends Factory
         return [
             'transaction_id' => Transaction::inRandomOrder()->value('id'),
             'user_id' => User::inRandomOrder()->value('id'),
-            'message' => $this->faker->text(30),
+            'message' => $this->faker->text(10),
             'image' => $this->faker->imageUrl(640, 480),
             'is_read' => false
         ];

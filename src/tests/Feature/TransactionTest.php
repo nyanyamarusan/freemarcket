@@ -328,7 +328,7 @@ class TransactionTest extends TestCase
         ]);
     }
 
-        public function test_store_message_and_image_success()
+    public function test_store_message_and_image_success()
     {
         $user = User::factory()->create();
         $partner = User::factory()->create();
