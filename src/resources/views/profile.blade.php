@@ -15,7 +15,19 @@
                 <span class="profile__image--none"></span>
                 @endif
             </div>
-            <p class="user__name">{{ $user->name }}</p>
+            <div class="user__info">
+                <p class="user__name">{{ $user->name }}</p>
+                @if ($user->average_rating !== null)
+                <div class="rating" data-rating="{{ $user->average_rating }}">
+                    @for ($i = 1; $i <= 5; $i++)
+                    <span class="star {{ $i <= $user->average_rating ? 'is-active' : '' }}">
+                        ★
+                    </span>
+                    @endfor
+                </div>
+                @endif
+            </div>
+
             <a href="/mypage/profile" class="profile__link">プロフィールを編集</a>
         </div>
     </div>
@@ -27,6 +39,14 @@
             <a href="/mypage?page=buy" class="{{ $tab === 'buy' ? 'active-tab' : 'inactive-tab' }}">
                 購入した商品
             </a>
+            <div class="transaction">
+                <a href="/mypage?page=transaction" class="{{ $tab === 'transaction' ? 'active-tab' : 'inactive-tab' }}">
+                    取引中の商品
+                </a>
+                @if ($totalCount > 0)
+                <span class="total-count">{{ $totalCount }}</span>
+                @endif
+            </div>
         </div>
     </div>
 </div>
@@ -55,6 +75,18 @@
                     @endif
                 </div>
                 <p class="item-name">{{ $item->name }}</p>
+            </a>
+            @endforeach
+        @endif
+        @if ($tab === 'transaction')
+            @foreach ($transactions as $transaction)
+            <a href="/transaction/{{ $transaction->id }}" class="item-card">
+                <div class="item-image">
+                    <img class="item-image__img" src="{{ asset('storage/item-img/' . $transaction->item->image) }}">
+                    @isset ($count[$transaction->id])
+                        <span class="count">{{ $count[$transaction->id] }}</span>
+                    @endisset
+                </div>
             </a>
             @endforeach
         @endif

@@ -11,6 +11,7 @@ use App\Models\Item;
 use App\Models\PaymentMethod;
 use App\Models\Purchase;
 use App\Models\Status;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Stripe\Checkout\Session as CheckoutSession;
 use Stripe\Stripe;
@@ -155,6 +156,17 @@ class ItemController extends Controller
 
         $metadata = $session->metadata;
 
+        $item = Item::findOrFail($metadata->item_id);
+
+        if ($item->sold === true) {
+            return redirect('/');
+        }
+
+        $transaction = Transaction::where('item_id', $item->id)->first();
+        if ($transaction) {
+            return redirect('/');
+        }
+
         Purchase::create([
             'user_id' => $metadata->user_id,
             'item_id' => $metadata->item_id,
@@ -164,7 +176,14 @@ class ItemController extends Controller
             'shipping_building' => $metadata->shipping_building,
         ]);
 
-        Item::find($metadata->item_id)->update(['sold' => true]);
+        $item->update(['sold' => true]);
+
+        Transaction::create([
+            'item_id' => $item->id,
+            'seller_id' => $item->user_id,
+            'buyer_id' => $metadata->user_id,
+            'status' => 'in_progress',
+        ]);
 
         return redirect('/');
     }

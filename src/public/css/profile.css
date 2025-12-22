@@ -16,7 +16,7 @@
     padding: 5% 20%;
     display: flex;
     align-items: center;
-    gap: 10%;
+    gap: 4%;
 }
 
 .profile__image {
@@ -39,8 +39,22 @@
     display: inline-block;
 }
 
+.user__info {
+    text-align: center;
+}
+
 .user__name {
     font-size: clamp(24px, 2.38vw, 42px);
+    margin: 0;
+}
+
+.star {
+    color: #D9D9D9;
+    font-size: clamp(20px, 2vw, 46px);
+}
+
+.star.is-active {
+    color: #FFF048;
 }
 
 .profile__link {
@@ -127,8 +141,33 @@
     background-color: #ff0000;
 }
 
+.total-count {
+    background-color: #ff0000;
+    color: #fff;
+    padding: 0 8px;
+    font-size: clamp(18px, 1.58vw, 28px);
+    border-radius: 10px;
+}
+
+.count {
+    position: absolute;
+    left: 1%;
+    top: 1%;
+    background-color: #ff0000;
+    color: #fff;
+    font-size: clamp(10px, 0.67vw, 14px);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    padding: 3px;
+}
+
 @media screen and (min-width: 768px) and (max-width: 1024px) {
     .item-list {
         grid-template-columns: repeat(3, 1fr);
+    }
+
+    .total-count {
+        padding: 0 6px;
     }
 }

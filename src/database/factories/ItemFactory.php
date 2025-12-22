@@ -26,7 +26,7 @@ class ItemFactory extends Factory
             'brand' => $this->faker->company(),
             'price' => $this->faker->numberBetween(100, 100000),
             'image' => $this->faker->imageUrl(640, 480, 'items', true),
-            'user_id' => User::factory(),
+            'user_id' => User::inRandomOrder()->value('id'),
             'status_id' => Status::factory(),
             'sold' => false,
             'description' => $this->faker->text(255),

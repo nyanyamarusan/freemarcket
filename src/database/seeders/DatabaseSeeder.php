@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Evaluation;
+use App\Models\Message;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -18,6 +20,49 @@ class DatabaseSeeder extends Seeder
             StatusesTableSeeder::class,
             ItemsTableSeeder::class,
             PaymentMethodsTableSeeder::class,
+            TransactionsTableSeeder::class,
+        ]);
+
+        Message::factory(2)->create(
+            [
+                'transaction_id' => 1,
+                'user_id' => 2,
+                'created_at' => now()->subDay(),
+            ]
+        );
+        Message::factory(2)->create(
+            [
+                'transaction_id' => 1,
+                'user_id' => 2,
+                'is_read' => true,
+            ]
+        );
+
+        Message::factory(2)->create(
+            [
+                'transaction_id' => 2,
+                'user_id' => 2,
+                'created_at' => now(),
+            ]
+        );
+
+        Message::factory(2)->create(
+            [
+                'transaction_id' => 2,
+                'user_id' => 1,
+            ]
+        );
+
+        Evaluation::factory()->create([
+            'evaluator_id' => 2,
+            'evaluatee_id' => 1,
+            'transaction_id' => 4,
+        ]);
+
+        Evaluation::factory()->create([
+            'evaluator_id' => 2,
+            'evaluatee_id' => 1,
+            'transaction_id' => 5,
         ]);
     }
 }

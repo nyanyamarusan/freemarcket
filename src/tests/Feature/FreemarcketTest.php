@@ -547,6 +547,13 @@ class FreemarcketTest extends TestCase
         $this->assertDatabaseHas('purchases', [
             'item_id' => $item->id,
         ]);
+
+        $this->assertDatabaseHas('transactions', [
+            'item_id' => $item->id,
+            'seller_id' => $item->user_id,
+            'buyer_id' => $user->id,
+            'status' => 'in_progress',
+        ]);
     }
 
     public function test_purchased_item_sold(): void
